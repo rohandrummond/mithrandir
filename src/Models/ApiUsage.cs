@@ -8,7 +8,7 @@ public class ApiUsage
   public string IpAddress { get; set; }
   public int StatusCode { get; set; }
 
-  // Foreign key
+  // Foreign key for ApiKey table
   public int ApiKeyId { get; set; }  
   public ApiKey ApiKey { get; set; } = null!;
 }

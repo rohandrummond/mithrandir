@@ -12,7 +12,3 @@ public class ApiKey
   public DateTimeOffset? ExpiresAt { get; set; }
   public DateTimeOffset? LastUsedAt { get; set; }
 }
-
-// Custom string enums for Tier and Status
-public enum Tier { Free, Pro }
-public enum Status { Active, Revoked }

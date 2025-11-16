@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 using mithrandir.Models;
 using mithrandir.Models.DTOs;
 using mithrandir.Data;
@@ -39,19 +41,32 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             ExpiresAt = request.ExpiresAt,
         };
 
-        // Save to database
-        _context.ApiKeys.Add(apiKey);
-        await _context.SaveChangesAsync();
-
-        // Return response
-        return new GenerateKeyResponse
+        try 
         {
-            Key = formattedKey,
-            Name = apiKey.Name,
-            Tier = apiKey.Tier,
-            CreatedAt = apiKey.CreatedAt,
-            ExpiresAt = apiKey.ExpiresAt
-        };
+            // Save to database
+            _context.ApiKeys.Add(apiKey);
+            await _context.SaveChangesAsync();
+            
+            // Return response
+            return new GenerateKeyResponse
+            {
+                Key = formattedKey,
+                Name = apiKey.Name,
+                Tier = apiKey.Tier,
+                CreatedAt = apiKey.CreatedAt,
+                ExpiresAt = apiKey.ExpiresAt
+            };
+        }
+        catch (DbUpdateException ex) 
+        {
+            // Handle database errors
+            throw new InvalidOperationException("Failed to save API key to database", ex);
+        }
+        catch (Exception ex)
+        {
+            // Handle other errors
+            throw new InvalidOperationException("An unexpected error occurred while generating API key", ex);
+        }
 
     }
 }

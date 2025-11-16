@@ -4,8 +4,8 @@ public class ApiUsage
 {
   public int Id { get; set; }
   public DateTimeOffset Timestamp { get; set; }
-  public string Endpoint { get; set; }
-  public string IpAddress { get; set; }
+  public required string Endpoint { get; set; }
+  public required string IpAddress { get; set; }
   public int StatusCode { get; set; }
 
   // Foreign key for ApiKey table

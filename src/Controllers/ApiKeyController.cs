@@ -11,7 +11,7 @@ namespace mithrandir.Controllers
 
         private readonly IApiKeyService _keyService = keyService;
 
-        // api/keys/generate [POST]
+        // Generate an API key [api/keys/generate] [POST]
         [HttpPost("generate")]
         public async Task<IActionResult> GenerateKey([FromBody] GenerateKeyRequest request)
         {
@@ -45,6 +45,31 @@ namespace mithrandir.Controllers
                 // Return error
                 return StatusCode(500, new { error = ex.Message });
             }
+        }
+        
+        // Validate an API key [api/keys/validate] [POST]
+        [HttpPost("validate")]
+        public async Task<IActionResult> ValidateKey([FromBody] ValidateKeyRequest request)
+        {
+            // Check that key is not null
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+
+            try
+            {
+                // Check if key is valid and send response
+                var result = await _keyService.ValidateKeyAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error
+                return StatusCode(500, new { error = ex.Message });
+            }
+                
+            
         }
     }
 }

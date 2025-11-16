@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 using mithrandir.Models;
 using mithrandir.Models.DTOs;
@@ -68,5 +69,45 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             throw new InvalidOperationException("An unexpected error occurred while generating API key", ex);
         }
 
+    }
+
+    public async Task<ValidateKeyResponse> ValidateKeyAsync(ValidateKeyRequest request)
+    {
+        try {
+            // Get active keys
+            var activeKeys = await _context.ApiKeys
+                .Where(k => k.Status == Status.Active)
+                .Where(k => k.ExpiresAt == null || k.ExpiresAt > DateTimeOffset.UtcNow)
+                .ToListAsync();
+            
+            // Find match for hash of request key
+            var match = activeKeys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
+
+            // Send response
+            if (match != null)
+            {
+                return new ValidateKeyResponse
+                {
+                    IsValid = true,
+                    Tier = match.Tier
+                };
+            }
+            else
+            {
+                return new ValidateKeyResponse
+                {
+                    IsValid = false,
+                    Reason = "Invalid or expired key"
+                };
+            }
+        } 
+        catch (DbException ex) 
+        {
+            throw new InvalidOperationException("Database error while validating key", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using mithrandir.Data;
+using mithrandir.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,9 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MithrandirDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MithrandirDb")));
 
-// Add services to the container.
+// Add services 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 
 var app = builder.Build();
 

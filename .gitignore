@@ -62,3 +62,6 @@ Thumbs.db
 appsettings.*.json
 !appsettings.json
 !appsettings.Development.json
+
+# JetBrains Rider
+.idea/

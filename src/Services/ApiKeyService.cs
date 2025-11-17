@@ -110,4 +110,45 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
         }
     }
+
+    public async Task<RevokeKeyResponse> RevokeKeyAsync(RevokeKeyRequest request)
+    {
+        try
+        {
+            // Get active keys
+            var activeKeys = await _context.ApiKeys
+                .Where(k => k.Status == Status.Active)
+                .ToListAsync();
+
+            // Find match and return error if not found
+            var match = activeKeys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
+            if (match == null)
+            {
+                return new RevokeKeyResponse
+                {
+                    Success = false,
+                    Message = "Key not found or already revoked"
+                };
+            }
+
+            // Update status and save changes
+            match.Status = Status.Revoked;
+            await _context.SaveChangesAsync();
+
+            // Return response
+            return new RevokeKeyResponse
+            {
+                Success = true,
+                Message = "Key has been revoked"
+            };
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("Database error while validating key", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
+        }
+    }
 }

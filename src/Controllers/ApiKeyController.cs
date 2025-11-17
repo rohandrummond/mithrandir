@@ -71,5 +71,25 @@ namespace mithrandir.Controllers
                 
             
         }
+
+        [HttpPost("revoke")]
+        public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+        
+            try
+            {
+                var result = await _keyService.RevokeKeyAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 }

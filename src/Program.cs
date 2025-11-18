@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using mithrandir.Data;
 using mithrandir.Services;
+using mithrandir.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

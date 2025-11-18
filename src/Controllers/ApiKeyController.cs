@@ -116,5 +116,11 @@ namespace mithrandir.Controllers
             }
 
         }
+
+        [HttpGet("restricted")]
+        public async Task<IActionResult> GetRestrictedContent()
+        {
+            return Ok("Kia ora");
+        }
     }
 }

@@ -10,12 +10,19 @@ public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
 
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
+        
+        // Implement only on restricted route
+        if (!context.Request.Path.StartsWithSegments("/api/keys/restricted"))
+        {
+            await _next(context);
+        }
+        
         if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKeyValue))
         {
             // Handle missing API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync("{\"error\": \"API key is required\"}");
+            await context.Response.WriteAsJsonAsync("Get outta here");
             return;
         };
 
@@ -29,7 +36,7 @@ public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
             // Handle invalid API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync("{\"error\": \"API key is invalid\"}");
+            await context.Response.WriteAsync("Api key is invalid");
             return;
         }
 

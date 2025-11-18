@@ -151,4 +151,45 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
         }
     }
+
+    public async Task<DeleteKeyResponse> DeleteKeyAsync(DeleteKeyRequest request)
+    {
+        try
+        {
+            // Get keys
+            var keys = await _context.ApiKeys
+                .ToListAsync();
+
+            // Find match and return error if not found
+            var match = keys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
+            if (match == null)
+            {
+                return new DeleteKeyResponse()
+                {
+                    Success = false,
+                    Message = "Key not found or already deleted"
+                };
+            }
+
+            // Delete key and save changes
+            _context.Remove(match);
+            await _context.SaveChangesAsync();
+
+            // Return response
+            return new DeleteKeyResponse
+            {
+                Success = true,
+                Message = "Key has been deleted"
+            };
+
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("Database error while deleting key", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while deleting key", ex);
+        }
+    }
 }

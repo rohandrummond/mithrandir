@@ -75,6 +75,7 @@ namespace mithrandir.Controllers
         [HttpPost("revoke")]
         public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
         {
+            // Check that key is not null
             if (string.IsNullOrEmpty(request.Key))
             {
                 return BadRequest("Key is required");
@@ -82,6 +83,7 @@ namespace mithrandir.Controllers
         
             try
             {
+                // Delete key and send response
                 var result = await _keyService.RevokeKeyAsync(request);
                 return Ok(result);
             }
@@ -90,6 +92,29 @@ namespace mithrandir.Controllers
                 // Return error
                 return StatusCode(500, new { error = ex.Message });
             }
+        }
+
+        [HttpPost("delete")]
+        public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
+        {
+            // Check that key is not null
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+
+            try
+            {
+                // Delete key and send response
+                var result = await _keyService.DeleteKeyAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error
+                return StatusCode(500, new { error = ex.Message });
+            }
+
         }
     }
 }

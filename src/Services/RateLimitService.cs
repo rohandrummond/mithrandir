@@ -45,12 +45,17 @@ public class RateLimitService(IConnectionMultiplexer redis) : IRateLimitService
         // Check if request count is within limit
         var withinLimit = requestCount <= limit;
         
+        // Compute how many minutes until reset
+        var resetTime = timeBlock.AddMinutes(10);
+        var remaining = resetTime - now;
+        var retryAfterSeconds = (int)Math.Ceiling(remaining.TotalSeconds);
+        
         // Return result
         return new RateLimitResult
         {
             Allowed = withinLimit,
             Remaining = limit - (int)requestCount, 
-            Reset = timeBlock.AddMinutes(10)
+            RetryAfterSeconds = retryAfterSeconds
         };
     }
 }

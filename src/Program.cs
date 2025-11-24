@@ -45,6 +45,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Register API key middleware
-app.UseMiddleware<ApiKeyAuthenticationMiddleware>();
+app.UseMiddleware<AuthenticationMiddleware>();
 
 app.Run();

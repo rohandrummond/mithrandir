@@ -11,7 +11,7 @@ namespace mithrandir.Controllers
 
         private readonly IApiKeyService _keyService = keyService;
 
-        // Generate an API key [api/keys/generate] [POST]
+        // Generate an API key
         [HttpPost("generate")]
         public async Task<IActionResult> GenerateKey([FromBody] GenerateKeyRequest request)
         {
@@ -47,7 +47,7 @@ namespace mithrandir.Controllers
             }
         }
         
-        // Validate an API key [api/keys/validate] [POST]
+        // Validate an API key 
         [HttpPost("validate")]
         public async Task<IActionResult> ValidateKey([FromBody] ValidateKeyRequest request)
         {
@@ -72,6 +72,7 @@ namespace mithrandir.Controllers
             
         }
 
+        // Revoke an API key
         [HttpPost("revoke")]
         public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
         {
@@ -94,6 +95,7 @@ namespace mithrandir.Controllers
             }
         }
 
+        // Delete an API key
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
         {
@@ -117,10 +119,11 @@ namespace mithrandir.Controllers
 
         }
 
+        // Restricted route for testing
         [HttpGet("restricted")]
         public async Task<IActionResult> GetRestrictedContent()
         {
-            return Ok("Kia ora");
+            return Ok("Haere mai!");
         }
     }
 }

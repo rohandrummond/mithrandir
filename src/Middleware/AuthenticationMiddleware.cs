@@ -1,10 +1,11 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Cryptography;
+using System.Text;
 using mithrandir.Services;
 using mithrandir.Models.DTOs;
 
 namespace mithrandir.Middleware;
 
-public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
+public class AuthenticationMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
 
@@ -15,6 +16,7 @@ public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
         if (!context.Request.Path.StartsWithSegments("/api/keys/restricted"))
         {
             await _next(context);
+            return;
         }
         
         if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKeyValue))
@@ -22,7 +24,7 @@ public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
             // Handle missing API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync("Get outta here");
+            await context.Response.WriteAsJsonAsync("You shall not pass (missing API key)");
             return;
         };
 
@@ -36,12 +38,23 @@ public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
             // Handle invalid API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync("Api key is invalid");
+            await context.Response.WriteAsync("You shall not pass (invalid API key)");
             return;
         }
 
         // Handle valid API key 
+        var redisHash = GetSha256Hash(apiKey);
+        context.Items["KeyHash"] = redisHash;
+        context.Items["Tier"] = result.Tier;
         await _next(context);
 
+    }
+    
+    // Hash API keys so they can be stored in context for Redis
+    private static string GetSha256Hash(string input)
+    {
+        var bytes = Encoding.UTF8.GetBytes(input);
+        var hashedBytes = SHA256.HashData(bytes);
+        return Convert.ToBase64String(hashedBytes);
     }
 }

@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+
+using mithrandir.Data;
 using mithrandir.Services;
 using mithrandir.Models;
 using mithrandir.Models.DTOs;
@@ -8,7 +11,8 @@ public class RateLimitingMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
 
-    public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService)
+
+    public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService, MithrandirDbContext dbContext)
     {
         
         // Implement only on restricted route for now
@@ -50,7 +54,49 @@ public class RateLimitingMiddleware(RequestDelegate next)
         
         // API key is within limit and we can continue
         await _next(context);
-    }
+        
+        // Store and validate API key and IP address
+        var apiKeyId = context.Items["Id"] as int?;
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        if (apiKeyId == null)
+        {
+            await Console.Error.WriteLineAsync("Unable to log key usage due to missing key id");
+            return; 
+        }
 
+        if (string.IsNullOrEmpty(ipAddress))
+        {
+            await Console.Error.WriteLineAsync("Warning: Unable to log IP address for request");
+            ipAddress = "Unknown";
+        }
+        
+        // Create ApiUsage object
+        var apiUsage = new ApiUsage
+        {
+            Timestamp = DateTimeOffset.UtcNow,
+            Endpoint =  context.Request.Path,
+            IpAddress = ipAddress,
+            StatusCode =  context.Response.StatusCode,
+            ApiKeyId = apiKeyId.Value,
+        };
+        
+        // Record usage in database
+        try
+        {
+            await dbContext.ApiUsages.AddAsync(apiUsage);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) 
+        {
+            // Handle database errors
+            await Console.Error.WriteLineAsync($"Failed to record key usage in database: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // Handle other errors
+            await Console.Error.WriteLineAsync($"Unexpected error occured while recording key usage: {ex.Message}");
+        }
+        
+    }
 
 }

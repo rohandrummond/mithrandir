@@ -46,6 +46,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
         var redisHash = GetSha256Hash(apiKey);
         context.Items["KeyHash"] = redisHash;
         context.Items["Tier"] = result.Tier;
+        context.Items["Id"] = result.Id;
         await _next(context);
 
     }

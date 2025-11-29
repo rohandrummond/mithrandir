@@ -61,7 +61,13 @@ namespace mithrandir.Controllers
             {
                 // Check if key is valid and send response
                 var result = await _keyService.ValidateKeyAsync(request);
-                return Ok(result);
+                var response = new ValidateKeyResponse
+                {
+                    IsValid = result.IsValid,
+                    Reason = result.Reason,
+                    Tier = result.Tier
+                };
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {

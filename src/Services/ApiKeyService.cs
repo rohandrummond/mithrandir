@@ -71,7 +71,7 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
 
     }
 
-    public async Task<ValidateKeyResponse> ValidateKeyAsync(ValidateKeyRequest request)
+    public async Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request)
     {
         try {
             // Get active keys
@@ -86,15 +86,16 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             // Send response
             if (match != null)
             {
-                return new ValidateKeyResponse
+                return new ValidateKeyResult
                 {
                     IsValid = true,
+                    Id = match.Id,
                     Tier = match.Tier
                 };
             }
             else
             {
-                return new ValidateKeyResponse
+                return new ValidateKeyResult
                 {
                     IsValid = false,
                     Reason = "Invalid or expired key"

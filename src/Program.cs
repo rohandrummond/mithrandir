@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using mithrandir.Data;
 using mithrandir.Services;
 using mithrandir.Middleware;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
 // Inject API key service
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+builder.Services.AddScoped<IRateLimitService, RateLimitService>();
 
 // Framework services
 builder.Services.AddControllers();
@@ -46,5 +47,6 @@ app.MapControllers();
 
 // Register API key middleware
 app.UseMiddleware<AuthenticationMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
 
 app.Run();

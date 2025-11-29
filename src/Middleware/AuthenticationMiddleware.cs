@@ -12,7 +12,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
         
-        // Implement only on restricted route
+        // Implement only on restricted route for now
         if (!context.Request.Path.StartsWithSegments("/api/keys/restricted"))
         {
             await _next(context);

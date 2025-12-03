@@ -22,7 +22,7 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
         {
             query = query
                 .Where(k => k.Status == Status.Active)
-                .Where(k => k.ExpiresAt > DateTimeOffset.UtcNow);
+                .Where(k => k.ExpiresAt == null || k.ExpiresAt > DateTimeOffset.UtcNow);
         }
 
         var keys = await query.ToListAsync();
@@ -90,14 +90,8 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
     public async Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request)
     {
         try {
-            // Get active keys
-            var activeKeys = await _context.ApiKeys
-                .Where(k => k.Status == Status.Active)
-                .Where(k => k.ExpiresAt == null || k.ExpiresAt > DateTimeOffset.UtcNow)
-                .ToListAsync();
-            
-            // Find match for hash of request key
-            var match = activeKeys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
+            // Search for key
+            var match = await FindKeyAsync(request.Key, true);
 
             // Send response
             if (match != null)
@@ -132,13 +126,10 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
     {
         try
         {
-            // Get active keys
-            var activeKeys = await _context.ApiKeys
-                .Where(k => k.Status == Status.Active)
-                .ToListAsync();
+            // Search for key
+            var match = await FindKeyAsync(request.Key, true);
 
             // Find match and return error if not found
-            var match = activeKeys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
             if (match == null)
             {
                 return new RevokeKeyResponse
@@ -173,12 +164,10 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
     {
         try
         {
-            // Get keys
-            var keys = await _context.ApiKeys
-                .ToListAsync();
+            // Search for key
+            var match= await FindKeyAsync(request.Key, true);
 
-            // Find match and return error if not found
-            var match = keys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(request.Key, k.KeyHash));
+            // Return error if not found
             if (match == null)
             {
                 return new DeleteKeyResponse()

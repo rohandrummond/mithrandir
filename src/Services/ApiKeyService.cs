@@ -14,6 +14,22 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
     // Store DbContext arg
     private readonly MithrandirDbContext _context = context;
 
+    private async Task<ApiKey?> FindKeyAsync(string key, bool activeOnly = false)
+    {
+        var query = _context.ApiKeys.AsQueryable();
+
+        if (activeOnly)
+        {
+            query = query
+                .Where(k => k.Status == Status.Active)
+                .Where(k => k.ExpiresAt > DateTimeOffset.UtcNow);
+        }
+
+        var keys = await query.ToListAsync();
+        
+        return keys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(key, k.KeyHash));
+    }
+
     public async Task<GenerateKeyResponse> GenerateKeyAsync(GenerateKeyRequest request)
     {
 
@@ -193,4 +209,14 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             throw new InvalidOperationException("An unexpected error occurred while deleting key", ex);
         }
     }
+
+    // public async Task<AddToWhitelistResponse> AddToWhitelistAsync(AddToWhitelistRequest request)
+    // {
+    //     // TO DO
+    // }
+    //
+    // public async Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request)
+    // {
+    //     // TO DO
+    // }
 }

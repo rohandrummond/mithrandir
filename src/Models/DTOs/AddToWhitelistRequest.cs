@@ -2,5 +2,6 @@ namespace mithrandir.Models.DTOs;
 
 public class AddToWhitelistRequest
 {
-    public string IpAddress { get; set; }
+    public required string Key {  get; set; }
+    public required string IpAddress { get; set; }
 }

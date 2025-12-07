@@ -199,13 +199,111 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
         }
     }
 
-    // public async Task<AddToWhitelistResponse> AddToWhitelistAsync(AddToWhitelistRequest request)
-    // {
-    //     // TO DO
-    // }
-    //
-    // public async Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request)
-    // {
-    //     // TO DO
-    // }
+    public async Task<AddToWhitelistResponse> AddToWhitelistAsync(AddToWhitelistRequest request)
+    {
+        try
+        {
+            // Find key
+            var match = await FindKeyAsync(request.Key, true);
+            if (match == null)
+            {
+                return new AddToWhitelistResponse
+                {
+                    Success = false,
+                    Message = "Key not found"
+                };
+            }
+
+            // Initialize list if null
+            if (match.IpWhitelist == null)
+            {
+                match.IpWhitelist = new List<string>();
+            }
+
+            // Check if already in whitelist
+            if (match.IpWhitelist.Contains(request.IpAddress))
+            {
+                return new AddToWhitelistResponse
+                {
+                    Success = false,
+                    Message = "IP address already in whitelist"
+                };
+            }
+            
+            // Add to whitelist and save
+            match.IpWhitelist.Add(request.IpAddress);
+            await _context.SaveChangesAsync();
+
+            // Return response
+            return new AddToWhitelistResponse
+            {
+                Success = true,
+                WhitelistedIps = match.IpWhitelist
+            };
+
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("Database error while adding IP address", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while adding IP address", ex);
+        }
+    }
+    
+    public async Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request)
+    {
+        try
+        {
+            // Find key
+            var match = await FindKeyAsync(request.Key, true);
+            if (match == null)
+            {
+                return new RemoveFromWhitelistResponse
+                {
+                    Success = false,
+                    Message = "Key not found or already removed"
+                };
+            }
+            
+            // Check whitelist exists
+            if (match.IpWhitelist == null)
+            {
+                return new RemoveFromWhitelistResponse
+                {
+                    Success = false,
+                    Message = "IP whitelist has not been configured"
+                };
+            }
+
+            // Check IP address is in whitelist
+            if (!match.IpWhitelist.Contains(request.IpAddress))
+            {
+                return new RemoveFromWhitelistResponse
+                {
+                    Success = false,
+                    Message = "IP address not in whitelist"
+                };
+            }
+            
+            // Remove from whitelist and save changes
+            match.IpWhitelist.Remove(request.IpAddress);
+            await _context.SaveChangesAsync();
+
+            return new RemoveFromWhitelistResponse
+            {
+                Success = true,
+                WhitelistedIps = match.IpWhitelist
+            };
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("Database error while removing IP address", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while removing IP address", ex);
+        }
+    }
 }

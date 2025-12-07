@@ -7,7 +7,7 @@ public class ApiKey
   public required string Name { get; set; }
   public Tier Tier { get; set; }
   public Status Status { get; set; }
-  public string[]? IpWhitelist { get; set; }
+  public List<string>? IpWhitelist { get; set; }
   public DateTimeOffset CreatedAt { get; set; }
   public DateTimeOffset? ExpiresAt { get; set; }
   public DateTimeOffset? LastUsedAt { get; set; }

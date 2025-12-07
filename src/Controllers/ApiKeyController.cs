@@ -119,10 +119,46 @@ namespace mithrandir.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // Return error
                 return StatusCode(500, new { error = ex.Message });
             }
+        }
 
+        // Add IP address to whitelist
+        public async Task<IActionResult> AddToWhitelist([FromBody] AddToWhitelistRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+
+            try
+            {
+                var result = await _keyService.AddToWhitelistAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        // Remove IP address from whitelist
+        public async Task<IActionResult> RemoveFromWhitelist([FromBody] RemoveFromWhitelistRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+
+            try
+            {
+                var result = await _keyService.RemoveFromWhitelistAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         // Restricted route for testing

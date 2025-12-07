@@ -8,4 +8,6 @@ public interface IApiKeyService
     Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request);
     Task<RevokeKeyResponse> RevokeKeyAsync(RevokeKeyRequest request);
     Task<DeleteKeyResponse> DeleteKeyAsync(DeleteKeyRequest request);
+    Task<AddToWhitelistResponse>  AddToWhitelistAsync(AddToWhitelistRequest request);
+    Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request);
 }

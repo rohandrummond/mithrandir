@@ -40,13 +40,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// HTTP request pipeline
 app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 
 // Register API key middleware
 app.UseMiddleware<AuthenticationMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
+
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

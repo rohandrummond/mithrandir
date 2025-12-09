@@ -11,9 +11,15 @@ public class RateLimitingMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
 
-
     public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService, MithrandirDbContext dbContext)
     {
+        
+        // Do not apply middleware on admin routes
+        if (context.Request.Path.StartsWithSegments("/api/admin"))
+        {
+            await _next(context);
+            return;
+        }
         
         // Get hash and tier from HTTP context
         var keyHash = context.Items["KeyHash"] as string;

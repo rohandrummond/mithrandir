@@ -10,7 +10,70 @@ namespace mithrandir.Controllers
     {
 
         private readonly IApiKeyService _keyService = keyService;
+        
+        // Validate an API key 
+        [HttpPost("validate")]
+        public async Task<IActionResult> ValidateKey([FromBody] ValidateKeyRequest request)
+        {
+            // Check that key is not null
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
 
+            try
+            {
+                // Check if key is valid and send response
+                var result = await _keyService.ValidateKeyAsync(request);
+                var response = new ValidateKeyResponse
+                {
+                    IsValid = result.IsValid,
+                    Reason = result.Reason,
+                    Tier = result.Tier
+                };
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error
+                return StatusCode(500, new { error = ex.Message });
+            }
+            
+        }
+
+        // Revoke an API key
+        [HttpPost("revoke")]
+        public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
+        {
+            // Check that key is not null
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+        
+            try
+            {
+                // Delete key and send response
+                var result = await _keyService.RevokeKeyAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Return error
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        
+    }
+    
+    // Admin only controller
+    [ApiController]
+    [Route("api/admin/keys")]
+    public class AdminKeysController(IApiKeyService keyService)  : ControllerBase
+    {
+        
+        private readonly IApiKeyService _keyService = keyService;
+        
         // Generate an API key
         [HttpPost("generate")]
         public async Task<IActionResult> GenerateKey([FromBody] GenerateKeyRequest request)
@@ -47,60 +110,6 @@ namespace mithrandir.Controllers
             }
         }
         
-        // Validate an API key 
-        [HttpPost("validate")]
-        public async Task<IActionResult> ValidateKey([FromBody] ValidateKeyRequest request)
-        {
-            // Check that key is not null
-            if (string.IsNullOrEmpty(request.Key))
-            {
-                return BadRequest("Key is required");
-            }
-
-            try
-            {
-                // Check if key is valid and send response
-                var result = await _keyService.ValidateKeyAsync(request);
-                var response = new ValidateKeyResponse
-                {
-                    IsValid = result.IsValid,
-                    Reason = result.Reason,
-                    Tier = result.Tier
-                };
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Return error
-                return StatusCode(500, new { error = ex.Message });
-            }
-                
-            
-        }
-
-        // Revoke an API key
-        [HttpPost("revoke")]
-        public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
-        {
-            // Check that key is not null
-            if (string.IsNullOrEmpty(request.Key))
-            {
-                return BadRequest("Key is required");
-            }
-        
-            try
-            {
-                // Delete key and send response
-                var result = await _keyService.RevokeKeyAsync(request);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Return error
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-
         // Delete an API key
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
@@ -122,8 +131,9 @@ namespace mithrandir.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-
+        
         // Add IP address to whitelist
+        [HttpPost("whitelist/add")]
         public async Task<IActionResult> AddToWhitelist([FromBody] AddToWhitelistRequest request)
         {
             if (string.IsNullOrEmpty(request.Key))
@@ -143,6 +153,7 @@ namespace mithrandir.Controllers
         }
 
         // Remove IP address from whitelist
+        [HttpPost("whitelist/remove")]
         public async Task<IActionResult> RemoveFromWhitelist([FromBody] RemoveFromWhitelistRequest request)
         {
             if (string.IsNullOrEmpty(request.Key))
@@ -159,13 +170,6 @@ namespace mithrandir.Controllers
             {
                 return StatusCode(500, new { error = ex.Message });
             }
-        }
-
-        // Restricted route for testing
-        [HttpGet("restricted")]
-        public async Task<IActionResult> GetRestrictedContent()
-        {
-            return Ok("Haere mai!");
         }
     }
 }

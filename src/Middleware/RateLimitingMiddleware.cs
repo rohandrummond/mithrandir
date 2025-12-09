@@ -15,13 +15,6 @@ public class RateLimitingMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService, MithrandirDbContext dbContext)
     {
         
-        // Implement only on restricted route for now
-        if (!context.Request.Path.StartsWithSegments("/api/keys/restricted"))
-        {
-            await _next(context);
-            return;
-        }
-        
         // Get hash and tier from HTTP context
         var keyHash = context.Items["KeyHash"] as string;
         var tier = context.Items["Tier"] as Tier?;

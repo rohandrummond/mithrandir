@@ -12,13 +12,6 @@ public class AuthenticationMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
         
-        // Implement only on restricted route for now
-        if (!context.Request.Path.StartsWithSegments("/api/keys/restricted"))
-        {
-            await _next(context);
-            return;
-        }
-        
         if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKeyValue))
         {
             // Handle missing API key

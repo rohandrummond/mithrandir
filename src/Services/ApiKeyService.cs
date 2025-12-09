@@ -100,7 +100,8 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
                 {
                     IsValid = true,
                     Id = match.Id,
-                    Tier = match.Tier
+                    Tier = match.Tier,
+                    IpWhitelist = match.IpWhitelist ?? new List<string>()
                 };
             }
             else

@@ -26,7 +26,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync("You shall not pass (missing API key)");
             return;
-        };
+        }
 
         var apiKey = apiKeyValue.ToString();
 
@@ -39,6 +39,25 @@ public class AuthenticationMiddleware(RequestDelegate next)
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("You shall not pass (invalid API key)");
+            return;
+        }
+        
+        // Check IP whitelist
+        var clientIp = context.Connection.RemoteIpAddress?.ToString();
+        
+        if (string.IsNullOrEmpty(clientIp))
+        {
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("Unable to determine client IP address");
+            return;
+        }
+        
+        if (!result.IpWhitelist.Contains(clientIp))
+        {
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("IP address has not been whitelisted");
             return;
         }
 

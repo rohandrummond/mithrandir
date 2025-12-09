@@ -6,5 +6,5 @@ public class ValidateKeyResult
     public int? Id { get; set; }
     public string? Reason { get; set; } 
     public Tier? Tier { get; set; }
-    public List<string> IpWhitelist { get; set; }
+    public List<string>? IpWhitelist { get; set; }
 }

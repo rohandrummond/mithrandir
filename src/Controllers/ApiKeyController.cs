@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using mithrandir.Services;
+using mithrandir.Attributes;
 using mithrandir.Models.DTOs;
 
 namespace mithrandir.Controllers
@@ -69,6 +70,7 @@ namespace mithrandir.Controllers
     // Admin only controller
     [ApiController]
     [Route("api/admin/keys")]
+    [RequireAdminKey]
     public class AdminKeysController(IApiKeyService keyService)  : ControllerBase
     {
         

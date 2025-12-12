@@ -15,7 +15,7 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
         var adminKey = configuration["AdminKey"];
         
         // Check if admin key is available
-        if (String.IsNullOrEmpty(adminKey))
+        if (string.IsNullOrEmpty(adminKey))
         {
             context.Result = new UnauthorizedObjectResult(new
             {

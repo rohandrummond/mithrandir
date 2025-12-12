@@ -92,10 +92,14 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
         try {
             // Search for key
             var match = await FindKeyAsync(request.Key, true);
-
-            // Send response
+            
             if (match != null)
             {
+                // Update LastUsedAt field for key
+                match.LastUsedAt = DateTimeOffset.UtcNow;
+                await _context.SaveChangesAsync();
+                
+                // Send response
                 return new ValidateKeyResult
                 {
                     IsValid = true,
@@ -104,14 +108,13 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
                     IpWhitelist = match.IpWhitelist ?? new List<string>()
                 };
             }
-            else
+            
+            return new ValidateKeyResult
             {
-                return new ValidateKeyResult
-                {
-                    IsValid = false,
-                    Reason = "Invalid or expired key"
-                };
-            }
+                IsValid = false,
+                Reason = "Invalid or expired key"
+            };
+            
         } 
         catch (DbException ex) 
         {

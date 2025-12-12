@@ -5,8 +5,8 @@ public class GetUsageResponse
     public Tier Tier { get; set; }
     public Status Status { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset ExpiresAt { get; set; }
-    public DateTimeOffset LastUsedAt { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
+    public DateTimeOffset? LastUsedAt { get; set; }
     public int TotalRequests { get; set; }
     public int SuccessfulRequests { get; set; }  // 2xx responses
     public int FailedRequests { get; set; }      // 4xx + 5xx responses

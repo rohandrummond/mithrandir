@@ -310,4 +310,50 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             throw new InvalidOperationException("An unexpected error occurred while removing IP address", ex);
         }
     }
+
+    public async Task<GetUsageResponse?> GetUsageAsync(GetUsageRequest request)
+    {
+        try
+        {
+            // Get entry from ApiKey table
+            var match = await FindKeyAsync(request.Key, true);
+            if (match == null)
+            {
+                return null;
+            }
+            
+            // TO DO
+            // Get entries from ApiUsage table and dynamically update response object
+            
+            // Calculate total requests, successful requests, failed requests, endpoint usage, status code summary
+            return new GetUsageResponse
+            {
+                Tier = match.Tier,
+                Status = match.Status,
+                CreatedAt = match.CreatedAt,
+                ExpiresAt = match.ExpiresAt,
+                LastUsedAt = match.LastUsedAt,
+                TotalRequests = 42, 
+                SuccessfulRequests = 38,  
+                FailedRequests = 4,
+                EndpointUsage = [
+                    new EndpointUsage { Endpoint = "GET /api/test", Count = 20 },
+                    new EndpointUsage { Endpoint = "POST /api/test", Count = 22 }
+                ],
+                StatusCodeSummaries = [
+                    new StatusCodeSummary { StatusCode = 200, Count = 38 },
+                    new StatusCodeSummary { StatusCode = 404, Count = 4 }
+                ]
+            };
+            
+        }
+        catch (DbException ex)
+        {
+            throw new InvalidOperationException("Database error while retrieving usage data", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("An unexpected error occurred while removing IP address", ex);
+        }
+    }
 }

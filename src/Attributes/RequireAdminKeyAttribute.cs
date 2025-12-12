@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace mithrandir.Attributes;
 
@@ -8,9 +10,18 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
 {
     public void OnAuthorization(AuthorizationFilterContext context)
     {
+        // Get admin key 
+        var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+        var adminKey = configuration["AdminKey"];
         
-        // Get the admin key from environment variable
-        // Check if admin key is available and return error otherwise
+        // Check if admin key is available
+        if (String.IsNullOrEmpty(adminKey))
+        {
+            context.Result = new UnauthorizedObjectResult(new
+            {
+                error = "Admin key not configured on server"
+            });
+        }
 
         // Check if the request has the X-Admin-Key header
         if (!context.HttpContext.Request.Headers.TryGetValue("X-Admin-Key", out var providedKey))
@@ -32,7 +43,7 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
             return;
         }
 
-        // Success! Mark the request as admin for other middleware
+        // Mark request as authorized
         context.HttpContext.Items["IsAdmin"] = true;
         
     }

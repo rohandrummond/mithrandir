@@ -10,4 +10,5 @@ public interface IApiKeyService
     Task<DeleteKeyResponse> DeleteKeyAsync(DeleteKeyRequest request);
     Task<AddToWhitelistResponse>  AddToWhitelistAsync(AddToWhitelistRequest request);
     Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request);
+    Task<GetUsageResponse?> GetUsageAsync(GetUsageRequest request);
 }

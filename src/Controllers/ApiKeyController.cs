@@ -65,6 +65,32 @@ namespace mithrandir.Controllers
             }
         }
         
+        // Get usage for API key
+        [HttpPost("usage")]
+        public async Task<IActionResult> GetUsage([FromBody] GetUsageRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Key))
+            {
+                return BadRequest("Key is required");
+            }
+
+            try
+            {
+                var result = await _keyService.GetUsageAsync(request);
+                
+                if (result == null)
+                {
+                    return NotFound(new { error = "API key not found" });
+                }
+                
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+        
     }
     
     // Admin only controller

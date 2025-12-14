@@ -24,7 +24,7 @@ public class RateLimitingMiddleware(RequestDelegate next)
         // Get hash and tier from HTTP context
         var keyHash = context.Items["KeyHash"] as string;
         var tier = context.Items["Tier"] as Tier?;
-
+        
         // Check for missing hash or tier
         if (keyHash == null || tier == null)
         {
@@ -33,7 +33,7 @@ public class RateLimitingMiddleware(RequestDelegate next)
             await context.Response.WriteAsync("Server error, API key context not found");
             return;
         }
-
+        
         var result = await rateLimitService.CheckAndIncrementAsync(keyHash, tier.Value);
 
         if (!result.Allowed)

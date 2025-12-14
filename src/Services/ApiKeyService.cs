@@ -324,10 +324,43 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
                 return null;
             }
             
-            // TO DO
-            // Get entries from ApiUsage table and dynamically update response object
+            // Get entries from ApiUsage
+            var usage = await _context.ApiUsages
+                .Where(u => u.ApiKeyId == match.Id)
+                .ToListAsync();
+
+            // Count total requests
+            var totalRequests = usage.Count;
             
-            // Calculate total requests, successful requests, failed requests, endpoint usage, status code summary
+            // Count successful requests
+            var successfulRequests = usage.Count(u => u.StatusCode >= 200 && u.StatusCode < 300);
+            
+            // Count failed requests
+            var failedRequests = usage.Count(u => u.StatusCode >= 400);
+            
+            // Group by endpoint 
+            var endpointUsage = usage
+                .GroupBy(u => u.Endpoint)
+                .Select(g => new EndpointUsage
+                {
+                    Endpoint = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(e => e.Count)
+                .ToList();
+            
+            // Group by status code
+            var statusCodeSummary = usage
+                .GroupBy(u => u.StatusCode)
+                .Select(g => new StatusCodeSummary
+                {
+                    StatusCode = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(e => e.Count)
+                .ToList();
+            
+            // Send response
             return new GetUsageResponse
             {
                 Tier = match.Tier,
@@ -335,17 +368,11 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
                 CreatedAt = match.CreatedAt,
                 ExpiresAt = match.ExpiresAt,
                 LastUsedAt = match.LastUsedAt,
-                TotalRequests = 42, 
-                SuccessfulRequests = 38,  
+                TotalRequests = totalRequests, 
+                SuccessfulRequests = successfulRequests,  
                 FailedRequests = 4,
-                EndpointUsage = [
-                    new EndpointUsage { Endpoint = "GET /api/test", Count = 20 },
-                    new EndpointUsage { Endpoint = "POST /api/test", Count = 22 }
-                ],
-                StatusCodeSummaries = [
-                    new StatusCodeSummary { StatusCode = 200, Count = 38 },
-                    new StatusCodeSummary { StatusCode = 404, Count = 4 }
-                ]
+                EndpointUsage = endpointUsage,
+                StatusCodeSummaries = statusCodeSummary
             };
             
         }

@@ -21,13 +21,6 @@ namespace mithrandir.Controllers
             {
                 return BadRequest("Key is required");
             }
-            
-            // Check that body and header match
-            var key = HttpContext.Items["ApiKey"]?.ToString();
-            if (request.Key != key)
-            {
-                return Unauthorized("You can't validate someone else's key"); 
-            }
 
             try
             {
@@ -50,7 +43,7 @@ namespace mithrandir.Controllers
         }
 
         // Revoke an API key
-        [HttpPost("revoke")]
+        [HttpPatch("revoke")]
         public async Task<IActionResult> RevokeKey([FromBody] RevokeKeyRequest request)
         {
             // Check that key is not null

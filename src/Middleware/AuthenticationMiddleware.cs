@@ -53,7 +53,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
             return;
         }
         
-        if (!result.IpWhitelist.Contains(clientIp))
+        if (result.IpWhitelist == null || !result.IpWhitelist.Contains(clientIp))
         {
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";

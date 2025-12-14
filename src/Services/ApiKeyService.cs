@@ -242,6 +242,7 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             return new AddToWhitelistResponse
             {
                 Success = true,
+                Message = "IP address added to whitelist",
                 WhitelistedIps = match.IpWhitelist
             };
 
@@ -298,6 +299,7 @@ public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
             return new RemoveFromWhitelistResponse
             {
                 Success = true,
+                Message = "IP address removed from whitelist",
                 WhitelistedIps = match.IpWhitelist
             };
         }

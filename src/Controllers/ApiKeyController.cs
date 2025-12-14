@@ -139,7 +139,7 @@ namespace mithrandir.Controllers
         }
         
         // Delete an API key
-        [HttpPost("delete")]
+        [HttpDelete("delete")]
         public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
         {
             // Check that key is not null
@@ -181,7 +181,7 @@ namespace mithrandir.Controllers
         }
 
         // Remove IP address from whitelist
-        [HttpPost("whitelist/remove")]
+        [HttpDelete("whitelist/remove")]
         public async Task<IActionResult> RemoveFromWhitelist([FromBody] RemoveFromWhitelistRequest request)
         {
             if (string.IsNullOrEmpty(request.Key))

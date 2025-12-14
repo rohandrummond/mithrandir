@@ -21,6 +21,13 @@ namespace mithrandir.Controllers
             {
                 return BadRequest("Key is required");
             }
+            
+            // Check that body and header match
+            var key = HttpContext.Items["ApiKey"]?.ToString();
+            if (request.Key != key)
+            {
+                return Unauthorized("You can't validate someone else's key"); 
+            }
 
             try
             {

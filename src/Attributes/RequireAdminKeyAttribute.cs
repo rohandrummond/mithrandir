@@ -12,7 +12,7 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
     {
         // Get admin key 
         var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-        var adminKey = configuration["AdminKey"];
+        var adminKey = configuration["AdminApiKey"];
         
         // Check if admin key is available
         if (string.IsNullOrEmpty(adminKey))

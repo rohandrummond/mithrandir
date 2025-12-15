@@ -10,18 +10,24 @@ namespace mithrandir.Middleware;
 public class RateLimitingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<RateLimitingMiddleware> _logger;
 
-    public RateLimitingMiddleware(RequestDelegate next)
+    public RateLimitingMiddleware(RequestDelegate next,  ILogger<RateLimitingMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService, MithrandirDbContext dbContext)
     {
+        _logger.LogInformation("Processing request with rate limiting middleware");
         
         // Do not apply middleware on admin routes
         if (context.Request.Path.StartsWithSegments("/api/admin"))
         {
+            _logger.LogInformation("Admin path detected, bypassing rate limiting: {Path}",
+                context.Request.Path);
+            
             await _next(context);
             return;
         }
@@ -33,6 +39,8 @@ public class RateLimitingMiddleware
         // Check for missing hash or tier
         if (keyHash == null || tier == null)
         {
+            _logger.LogError("Rate limiting middleware failed as key hash or tier is missing from HTTP context");
+            
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("Server error, API key context not found");
@@ -43,6 +51,9 @@ public class RateLimitingMiddleware
 
         if (!result.Allowed)
         {
+            _logger.LogWarning("Rate limit has been hit, bouncing request. Hash =  {KeyHash}, Tier = {Tier}",
+                keyHash, tier);
+            
             // API key has hit rate limit and request should be bounced
             var error = new RateLimitError
             {
@@ -59,18 +70,20 @@ public class RateLimitingMiddleware
         // API key is within limit and we can continue
         await _next(context);
         
+
+        
         // Store and validate API key and IP address
         var apiKeyId = context.Items["Id"] as int?;
         var ipAddress = context.Connection.RemoteIpAddress?.ToString();
         if (apiKeyId == null)
         {
-            await Console.Error.WriteLineAsync("Unable to log key usage due to missing key id");
+            _logger.LogError("Unable to log usage as key ID is missing from HTTP context");
             return; 
         }
 
         if (string.IsNullOrEmpty(ipAddress))
         {
-            await Console.Error.WriteLineAsync("Warning: Unable to log IP address for request");
+            _logger.LogError("Unable to log IP address in usage records due to inability to determine client IP");
             ipAddress = "Unknown";
         }
         
@@ -84,6 +97,10 @@ public class RateLimitingMiddleware
             ApiKeyId = apiKeyId.Value,
         };
         
+        _logger.LogDebug(
+            "Recording API usage. Key ID = {KeyId}, IP Address = {IpAddress}, Endpoint: {Endpoint}",
+            apiUsage.ApiKeyId, apiUsage.IpAddress, apiUsage.Endpoint);
+        
         // Record usage in database
         try
         {
@@ -92,13 +109,13 @@ public class RateLimitingMiddleware
         }
         catch (DbUpdateException ex) 
         {
-            // Handle database errors
-            await Console.Error.WriteLineAsync($"Failed to record key usage in database: {ex.Message}");
+            _logger.LogError(ex, "Database error while recording key usage: Key ID = {KeyId}, IP Address = {IpAddress}, Endpoint: {Endpoint}",
+                apiUsage.ApiKeyId, apiUsage.IpAddress, apiUsage.Endpoint);
         }
         catch (Exception ex)
         {
-            // Handle other errors
-            await Console.Error.WriteLineAsync($"Unexpected error occured while recording key usage: {ex.Message}");
+            _logger.LogError(ex, "Unexpected error while recording key usage: Key ID = {KeyId}, IP Address = {IpAddress}, Endpoint: {Endpoint}",
+                apiUsage.ApiKeyId, apiUsage.IpAddress, apiUsage.Endpoint);
         }
         
     }

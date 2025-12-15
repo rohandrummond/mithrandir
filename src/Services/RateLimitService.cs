@@ -4,9 +4,14 @@ using StackExchange.Redis;
 
 namespace mithrandir.Services;
 
-public class RateLimitService(IConnectionMultiplexer redis) : IRateLimitService
+public class RateLimitService : IRateLimitService
 {
-    private readonly IConnectionMultiplexer _redis = redis;
+    private readonly IConnectionMultiplexer _redis;
+
+    public RateLimitService(IConnectionMultiplexer redis)
+    {
+        _redis = redis;
+    }
     
     public async Task<RateLimitResult> CheckAndIncrementAsync(string keyHash, Tier tier)
     {

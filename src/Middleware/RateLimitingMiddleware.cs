@@ -7,9 +7,14 @@ using mithrandir.Models.DTOs;
 
 namespace mithrandir.Middleware;
 
-public class RateLimitingMiddleware(RequestDelegate next)
+public class RateLimitingMiddleware
 {
-    private readonly RequestDelegate _next = next;
+    private readonly RequestDelegate _next;
+
+    public RateLimitingMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
 
     public async Task InvokeAsync(HttpContext context, IRateLimitService rateLimitService, MithrandirDbContext dbContext)
     {

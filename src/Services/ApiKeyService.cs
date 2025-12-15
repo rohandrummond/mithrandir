@@ -9,10 +9,15 @@ using System.Security.Cryptography;
 
 namespace mithrandir.Services;
 
-public class ApiKeyService(MithrandirDbContext context) : IApiKeyService
+public class ApiKeyService : IApiKeyService
 {
     // Store DbContext arg
-    private readonly MithrandirDbContext _context = context;
+    private readonly MithrandirDbContext _context;
+
+    public ApiKeyService(MithrandirDbContext context)
+    {
+        _context = context;
+    }
 
     private async Task<ApiKey?> FindKeyAsync(string key, bool activeOnly = false)
     {

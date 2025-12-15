@@ -40,9 +40,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); [ENABLE IN PROD]
 
-// Register API key middleware
+// Register middleware
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<AuthenticationMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
 

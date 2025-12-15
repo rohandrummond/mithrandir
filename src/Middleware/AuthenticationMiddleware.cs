@@ -5,9 +5,14 @@ using mithrandir.Models.DTOs;
 
 namespace mithrandir.Middleware;
 
-public class AuthenticationMiddleware(RequestDelegate next)
+public class AuthenticationMiddleware
 {
-    private readonly RequestDelegate _next = next;
+    private readonly RequestDelegate _next;
+
+    public AuthenticationMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
 
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {

@@ -11,18 +11,23 @@ namespace mithrandir.Services;
 
 public class ApiKeyService : IApiKeyService
 {
-    // Store DbContext arg
     private readonly MithrandirDbContext _context;
+    private readonly ILogger<ApiKeyService> _logger;
 
-    public ApiKeyService(MithrandirDbContext context)
+    public ApiKeyService(MithrandirDbContext context, ILogger<ApiKeyService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     private async Task<ApiKey?> FindKeyAsync(string key, bool activeOnly = false)
     {
+        _logger.LogInformation("Finding API key, activeOnly = {ActiveOnly}", activeOnly);
+
+        // Initialise query
         var query = _context.ApiKeys.AsQueryable();
 
+        // Update query if active only
         if (activeOnly)
         {
             query = query
@@ -30,13 +35,28 @@ public class ApiKeyService : IApiKeyService
                 .Where(k => k.ExpiresAt == null || k.ExpiresAt > DateTimeOffset.UtcNow);
         }
 
+        // Get keys and find match
         var keys = await query.ToListAsync();
+        var match = keys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(key, k.KeyHash));
         
-        return keys.FirstOrDefault(k => BCrypt.Net.BCrypt.Verify(key, k.KeyHash));
+        // Log based on whether match is found 
+        if (match != null)
+        {
+            _logger.LogDebug("API key found: ID = {KeyId}, Name = {KeyName}", match.Id, match.Name);
+        }
+        else
+        {
+            _logger.LogDebug("API key not found");
+        }
+    
+        // Return match
+        return match;
     }
 
     public async Task<GenerateKeyResponse> GenerateKeyAsync(GenerateKeyRequest request)
     {
+        _logger.LogInformation("Generating new API key: Name = {Name}, Tier = {Tier}", 
+            request.Name, request.Tier);
 
         // Generate random key
         var bytes = new byte[32];
@@ -69,6 +89,9 @@ public class ApiKeyService : IApiKeyService
             _context.ApiKeys.Add(apiKey);
             await _context.SaveChangesAsync();
             
+            _logger.LogInformation("API key generated: ID = {KeyId}, Name = {Name}", 
+                apiKey.Id, apiKey.Name);
+            
             // Return response
             return new GenerateKeyResponse
             {
@@ -82,11 +105,13 @@ public class ApiKeyService : IApiKeyService
         catch (DbUpdateException ex) 
         {
             // Handle database errors
+            _logger.LogError(ex, "Database error while generating API key: Name = {Name}", request.Name);
             throw new InvalidOperationException("Failed to save API key to database", ex);
         }
         catch (Exception ex)
         {
             // Handle other errors
+            _logger.LogError(ex, "Unexpected error while generating API key: Name = {Name}", request.Name);
             throw new InvalidOperationException("An unexpected error occurred while generating API key", ex);
         }
 
@@ -94,12 +119,17 @@ public class ApiKeyService : IApiKeyService
 
     public async Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request)
     {
+        _logger.LogInformation("Validating API key");
+        
         try {
             // Search for key
             var match = await FindKeyAsync(request.Key, true);
             
             if (match != null)
             {
+                _logger.LogDebug("API key validated successfully: ID = {KeyId}, Name = {Name}", 
+                    match.Id, match.Name);
+                
                 // Update LastUsedAt field for key
                 match.LastUsedAt = DateTimeOffset.UtcNow;
                 await _context.SaveChangesAsync();
@@ -114,6 +144,8 @@ public class ApiKeyService : IApiKeyService
                 };
             }
             
+            _logger.LogWarning("API key validation failed");
+            
             return new ValidateKeyResult
             {
                 IsValid = false,
@@ -123,16 +155,20 @@ public class ApiKeyService : IApiKeyService
         } 
         catch (DbException ex) 
         {
+            _logger.LogError(ex, "Database error while validating key");
             throw new InvalidOperationException("Database error while validating key", ex);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unexpected error while validating key");
             throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
         }
     }
 
     public async Task<RevokeKeyResponse> RevokeKeyAsync(RevokeKeyRequest request)
     {
+        _logger.LogInformation("Revoking API key");
+        
         try
         {
             // Search for key
@@ -141,6 +177,8 @@ public class ApiKeyService : IApiKeyService
             // Find match and return error if not found
             if (match == null)
             {
+                _logger.LogWarning("Cannot revoke access because key not found or already revoked");
+
                 return new RevokeKeyResponse
                 {
                     Success = false,
@@ -151,6 +189,9 @@ public class ApiKeyService : IApiKeyService
             // Update status and save changes
             match.Status = Status.Revoked;
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("API key revoked: ID = {KeyId}, Name = {Name}", 
+                match.Id, match.Name);
 
             // Return response
             return new RevokeKeyResponse
@@ -161,16 +202,20 @@ public class ApiKeyService : IApiKeyService
         }
         catch (DbUpdateException ex)
         {
-            throw new InvalidOperationException("Database error while validating key", ex);
+            _logger.LogError(ex, "Database error while revoking API key");
+            throw new InvalidOperationException("Database error while revoking key", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("An unexpected error occurred while validating key", ex);
+            _logger.LogError(ex, "Unexpected error while revoking key");
+            throw new InvalidOperationException("Unexpected error while revoking key", ex);
         }
     }
 
     public async Task<DeleteKeyResponse> DeleteKeyAsync(DeleteKeyRequest request)
     {
+        _logger.LogInformation("Attempting to delete API key");
+
         try
         {
             // Search for key
@@ -179,6 +224,8 @@ public class ApiKeyService : IApiKeyService
             // Return error if not found
             if (match == null)
             {
+                _logger.LogWarning("Cannot delete API key because key not found or already deleted");
+                
                 return new DeleteKeyResponse()
                 {
                     Success = false,
@@ -189,6 +236,8 @@ public class ApiKeyService : IApiKeyService
             // Delete key and save changes
             _context.Remove(match);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("API key deleted successfully: ID = {KeyId}", match.Id);
 
             // Return response
             return new DeleteKeyResponse
@@ -200,22 +249,28 @@ public class ApiKeyService : IApiKeyService
         }
         catch (DbUpdateException ex)
         {
+            _logger.LogError(ex, "Database error while deleting key");
             throw new InvalidOperationException("Database error while deleting key", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("An unexpected error occurred while deleting key", ex);
+            _logger.LogError(ex, "Unexpected error while deleting key");
+            throw new InvalidOperationException("Unexpected error while deleting key", ex);
         }
     }
 
     public async Task<AddToWhitelistResponse> AddToWhitelistAsync(AddToWhitelistRequest request)
     {
+        _logger.LogInformation("Adding IP to whitelist: {IpAddress}", request.IpAddress);
+        
         try
         {
             // Find key
             var match = await FindKeyAsync(request.Key, true);
             if (match == null)
             {
+                _logger.LogWarning("Cannot add IP to whitelist because key not found");
+                
                 return new AddToWhitelistResponse
                 {
                     Success = false,
@@ -232,6 +287,9 @@ public class ApiKeyService : IApiKeyService
             // Check if already in whitelist
             if (match.IpWhitelist.Contains(request.IpAddress))
             {
+                _logger.LogInformation("IP already in whitelist: Key ID = {KeyId}, IP = {IpAddress}", 
+                    match.Id, request.IpAddress);
+                
                 return new AddToWhitelistResponse
                 {
                     Success = false,
@@ -242,6 +300,9 @@ public class ApiKeyService : IApiKeyService
             // Add to whitelist and save
             match.IpWhitelist.Add(request.IpAddress);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("IP added to whitelist successfully: Key ID = {KeyId}, IP = {IpAddress}", 
+                match.Id, request.IpAddress);
 
             // Return response
             return new AddToWhitelistResponse
@@ -254,22 +315,30 @@ public class ApiKeyService : IApiKeyService
         }
         catch (DbUpdateException ex)
         {
+            _logger.LogError(ex, "Database error while adding IP to whitelist: IP = {IpAddress}", 
+                request.IpAddress);
             throw new InvalidOperationException("Database error while adding IP address", ex);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unexpected error while adding IP to whitelist: IP = {IpAddress}", 
+                request.IpAddress);
             throw new InvalidOperationException("An unexpected error occurred while adding IP address", ex);
         }
     }
     
     public async Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request)
     {
+        _logger.LogInformation("Removing IP from whitelist: {IpAddress}", request.IpAddress);
+        
         try
         {
             // Find key
             var match = await FindKeyAsync(request.Key, true);
             if (match == null)
             {
+                _logger.LogWarning("Cannot remove IP from whitelist because key not found");
+
                 return new RemoveFromWhitelistResponse
                 {
                     Success = false,
@@ -280,6 +349,9 @@ public class ApiKeyService : IApiKeyService
             // Check whitelist exists
             if (match.IpWhitelist == null)
             {
+                _logger.LogWarning("Cannot remove from whitelist because whitelist not configured: Key ID = {KeyId}", 
+                    match.Id);
+                
                 return new RemoveFromWhitelistResponse
                 {
                     Success = false,
@@ -290,6 +362,9 @@ public class ApiKeyService : IApiKeyService
             // Check IP address is in whitelist
             if (!match.IpWhitelist.Contains(request.IpAddress))
             {
+                _logger.LogWarning("Cannot remove because IP is not in whitelist: Key ID = {KeyId}, IP = {IpAddress}", 
+                    match.Id, request.IpAddress);
+                
                 return new RemoveFromWhitelistResponse
                 {
                     Success = false,
@@ -300,6 +375,9 @@ public class ApiKeyService : IApiKeyService
             // Remove from whitelist and save changes
             match.IpWhitelist.Remove(request.IpAddress);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("IP removed from whitelist successfully: KeyID = {KeyId}, IP = {IpAddress}", 
+                match.Id, request.IpAddress);
 
             return new RemoveFromWhitelistResponse
             {
@@ -310,22 +388,29 @@ public class ApiKeyService : IApiKeyService
         }
         catch (DbUpdateException ex)
         {
-            throw new InvalidOperationException("Database error while removing IP address", ex);
+            _logger.LogError(ex, "Database error while removing IP from whitelist: IP = {IpAddress}", 
+                request.IpAddress);
+            throw new InvalidOperationException("Database error while removing IP from whitelist", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("An unexpected error occurred while removing IP address", ex);
+            _logger.LogError(ex, "Unexpected error while removing IP from whitelist: IP = {IpAddress}", 
+                request.IpAddress);
+            throw new InvalidOperationException("An unexpected error occurred while removing IP from whitelist", ex);
         }
     }
 
     public async Task<GetUsageResponse?> GetUsageAsync(GetUsageRequest request)
     {
+        _logger.LogInformation("Retrieving usage data for API key");
+
         try
         {
             // Get entry from ApiKey table
             var match = await FindKeyAsync(request.Key, true);
             if (match == null)
             {
+                _logger.LogWarning("Cannot retrieve usage data because key not found");
                 return null;
             }
             
@@ -333,6 +418,9 @@ public class ApiKeyService : IApiKeyService
             var usage = await _context.ApiUsages
                 .Where(u => u.ApiKeyId == match.Id)
                 .ToListAsync();
+            
+            _logger.LogInformation("Usage data retrieved: Key ID = {KeyId}, Total Records = {RecordCount}", 
+                match.Id, usage.Count);
 
             // Count total requests
             var totalRequests = usage.Count;
@@ -375,7 +463,7 @@ public class ApiKeyService : IApiKeyService
                 LastUsedAt = match.LastUsedAt,
                 TotalRequests = totalRequests, 
                 SuccessfulRequests = successfulRequests,  
-                FailedRequests = 4,
+                FailedRequests = failedRequests,
                 EndpointUsage = endpointUsage,
                 StatusCodeSummaries = statusCodeSummary
             };
@@ -383,11 +471,13 @@ public class ApiKeyService : IApiKeyService
         }
         catch (DbException ex)
         {
+            _logger.LogError(ex, "Database error while retrieving usage data");
             throw new InvalidOperationException("Database error while retrieving usage data", ex);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("An unexpected error occurred while removing IP address", ex);
+            _logger.LogError(ex, "Unexpected error while retrieving usage data");
+            throw new InvalidOperationException("Unexpected error while retrieving usage data", ex);
         }
     }
 }

@@ -44,12 +44,12 @@ public class RateLimitService : IRateLimitService
         // If first request, set key to expire in 10 minutes
         if (requestCount == 1)
         {
-            _logger.LogDebug("No existing request count, setting key to expire in 10 minutes");
+            _logger.LogDebug("First request in window, setting expiry: Key = {RedisKey}", redisKey);
             await db.KeyExpireAsync(redisKey, TimeSpan.FromMinutes(10));
         }
         else
         {
-            _logger.LogDebug("Incrementing request count");
+            _logger.LogDebug("Request count incremented: Count = {RequestCount}", requestCount);
         }
         
         // Set limit based on Tier
@@ -62,6 +62,17 @@ public class RateLimitService : IRateLimitService
         var resetTime = timeBlock.AddMinutes(10);
         var remaining = resetTime - now;
         var retryAfterSeconds = (int)Math.Ceiling(remaining.TotalSeconds);
+        
+        if (!withinLimit)
+        {
+            _logger.LogWarning("Rate limit exceeded: Tier = {Tier}, Count = {RequestCount}, Limit = {Limit}, RetryAfter = {RetryAfter}s", 
+                tier, requestCount, limit, retryAfterSeconds);
+        }
+        else
+        {
+            _logger.LogDebug("Rate limit check passed: Tier = {Tier}, Count = {RequestCount}, Limit = {Limit}, Remaining = {Remaining}", 
+                tier, requestCount, limit, limit - (int)requestCount);
+        }
         
         // Return result
         return new RateLimitResult

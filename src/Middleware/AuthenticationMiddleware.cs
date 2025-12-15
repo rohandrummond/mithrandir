@@ -8,24 +8,32 @@ namespace mithrandir.Middleware;
 public class AuthenticationMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<AuthenticationMiddleware> _logger;
 
-    public AuthenticationMiddleware(RequestDelegate next)
+    public AuthenticationMiddleware(RequestDelegate next, ILogger<AuthenticationMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
+        _logger.LogInformation("Processing request with authentication middleware");
         
         // Do not apply middleware on admin routes
         if (context.Request.Path.StartsWithSegments("/api/admin"))
         {
+            _logger.LogInformation("Admin path detected, bypassing authentication: {Path}",
+                context.Request.Path);
+            
             await _next(context);
             return;
         }
         
         if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKeyValue))
         {
+            _logger.LogWarning("Authentication failed due to missing X-Api-Key header");
+            
             // Handle missing API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
@@ -40,6 +48,8 @@ public class AuthenticationMiddleware
 
         if (!result.IsValid)
         {
+            _logger.LogWarning("Authentication failed due to invalid API key");
+            
             // Handle invalid API key
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
@@ -52,6 +62,10 @@ public class AuthenticationMiddleware
         
         if (string.IsNullOrEmpty(clientIp))
         {
+            _logger.LogWarning("Authentication failed due inability to determine client IP. Key ID = {KeyId}",
+                result.Id);
+            
+            // Handle undetermined client IP
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("Unable to determine client IP address");
@@ -60,11 +74,18 @@ public class AuthenticationMiddleware
         
         if (result.IpWhitelist == null || !result.IpWhitelist.Contains(clientIp))
         {
+            _logger.LogWarning("Authentication failed due to IP not being whitelisted. Key ID = {KeyId},  Client IP = {ClientIp}",
+                result.Id , clientIp);
+            
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("IP address has not been whitelisted");
             return;
         }
+        
+        _logger.LogInformation(
+            "Request authenticated. Key ID = {KeyId}, Tier: {Tier}, IP: {ClientIp}",
+            result.Id , result.Tier, clientIp);
 
         // Handle valid API key 
         var redisHash = GetSha256Hash(apiKey);

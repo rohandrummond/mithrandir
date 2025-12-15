@@ -7,14 +7,17 @@ namespace mithrandir.Services;
 public class RateLimitService : IRateLimitService
 {
     private readonly IConnectionMultiplexer _redis;
+    private readonly ILogger<RateLimitService> _logger;
 
-    public RateLimitService(IConnectionMultiplexer redis)
+    public RateLimitService(IConnectionMultiplexer redis, ILogger<RateLimitService> logger)
     {
         _redis = redis;
+        _logger = logger;
     }
     
     public async Task<RateLimitResult> CheckAndIncrementAsync(string keyHash, Tier tier)
     {
+        _logger.LogInformation("Checking rate limit in Redis");
         
         // Get IDatabase object from StackExchange
         var db = _redis.GetDatabase();
@@ -41,7 +44,12 @@ public class RateLimitService : IRateLimitService
         // If first request, set key to expire in 10 minutes
         if (requestCount == 1)
         {
+            _logger.LogDebug("No existing request count, setting key to expire in 10 minutes");
             await db.KeyExpireAsync(redisKey, TimeSpan.FromMinutes(10));
+        }
+        else
+        {
+            _logger.LogDebug("Incrementing request count");
         }
         
         // Set limit based on Tier

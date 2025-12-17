@@ -31,72 +31,16 @@ public class FakeIpStartupFilter : IStartupFilter
     }
 }
 
-public class ApiKeysControllerTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApiKeysControllerTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
-    private readonly WebApplicationFactory<Program> _factory;
     private const string TestIp = "127.0.0.1";
     
-    public ApiKeysControllerTests(WebApplicationFactory<Program> factory)
-    {
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                var dbContextDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(MithrandirDbContext));
-                if (dbContextDescriptor != null)
-                    services.Remove(dbContextDescriptor);
-                
-                var optionsDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<MithrandirDbContext>));
-                if (optionsDescriptor != null)
-                    services.Remove(optionsDescriptor);
-                
-                var optionsConfigDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(IDbContextOptionsConfiguration<MithrandirDbContext>));
-                if (optionsConfigDescriptor != null)
-                    services.Remove(optionsConfigDescriptor);
-                
-                services.AddSingleton<IStartupFilter, FakeIpStartupFilter>();
-
-                services.AddDbContext<MithrandirDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase("TestDb");
-                });
-
-                var sp = services.BuildServiceProvider();
-                using (var scope = sp.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<MithrandirDbContext>();
-                    db.Database.EnsureCreated();
-                }
-                
-                // Remove real Redis
-                var redisDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(IConnectionMultiplexer));
-                if (redisDescriptor != null)
-                    services.Remove(redisDescriptor);
-
-                // Add a mock Redis using a library like Moq, or use a fake implementation
-                services.AddSingleton<IConnectionMultiplexer>(
-                    _ => ConnectionMultiplexer.Connect("localhost:6379,allowAdmin=true,defaultDatabase=15")
-                );
-                
-            });
-
-            builder.ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    { "AdminApiKey", "test-admin-key" },
-                });
-            });
-        });
-        
-        _client = _factory.CreateClient();
+    public ApiKeysControllerTests(CustomWebApplicationFactory factory)
+    { 
+        _client = factory.CreateClient();
     }
-
+      
     [Fact]
     public async Task ValidateKey_WithoutApiKey_ReturnsUnauthorized()
     {

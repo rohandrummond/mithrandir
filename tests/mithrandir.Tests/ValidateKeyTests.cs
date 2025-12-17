@@ -311,7 +311,7 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
       using (var scope = _factory.Services.CreateScope())
       {
           var db = scope.ServiceProvider.GetRequiredService<MithrandirDbContext>();
-          var apiKey = await db.ApiKeys.FirstAsync(k => k.Name == "Test Key");
+          var apiKey = await db.ApiKeys.FirstAsync(k => k.Name == "Expiry Test Key");
           apiKey.ExpiresAt = DateTimeOffset.UtcNow.AddHours(-1);
           await db.SaveChangesAsync();
       }

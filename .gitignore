@@ -63,5 +63,8 @@ appsettings.*.json
 !appsettings.json
 !appsettings.Development.json
 
+# Claude
+CLAUDE.md
+
 # JetBrains Rider
 .idea/

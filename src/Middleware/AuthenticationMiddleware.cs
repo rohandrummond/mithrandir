@@ -44,7 +44,7 @@ public class AuthenticationMiddleware
         var apiKey = apiKeyValue.ToString();
 
         // Validate key
-        var result = await apiKeyService.ValidateKeyAsync(new ValidateKeyRequest { Key = apiKey });
+        var result = await apiKeyService.AuthenticateKeyAsync(new AuthenticateKeyRequest() { Key = apiKey });
 
         if (!result.IsValid)
         {

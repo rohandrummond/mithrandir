@@ -5,6 +5,7 @@ namespace mithrandir.Services;
 public interface IApiKeyService
 {
     Task<GenerateKeyResponse> GenerateKeyAsync(GenerateKeyRequest request);
+    Task<AuthenticateKeyResponse> AuthenticateKeyAsync(AuthenticateKeyRequest request);
     Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request);
     Task<RevokeKeyResponse> RevokeKeyAsync(RevokeKeyRequest request);
     Task<DeleteKeyResponse> DeleteKeyAsync(DeleteKeyRequest request);

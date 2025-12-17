@@ -117,6 +117,66 @@ public class ApiKeyService : IApiKeyService
 
     }
 
+    public async Task<AuthenticateKeyResponse> AuthenticateKeyAsync(AuthenticateKeyRequest request)
+    {
+        _logger.LogInformation("Authenticating API key");
+        try
+        {
+            var match = await FindKeyAsync(request.Key, true);
+
+            if (match != null)
+            {
+                if (match.ExpiresAt != null && match.ExpiresAt <= DateTimeOffset.UtcNow)
+                {
+                    _logger.LogInformation(
+                        "API key expired: ID = {KeyId}, Name = {Name}, ExpiresAt = {ExpiresAt}",
+                        match.Id, match.Name, match.ExpiresAt);
+
+                    return new AuthenticateKeyResponse
+                    {
+                        IsValid = false,
+                        Reason = "Key expired"
+                    };
+                }
+            
+                _logger.LogDebug("API key authenticated successfully: ID = {KeyId}, Name = {Name}",
+                    match.Id, match.Name);
+
+                match.LastUsedAt = DateTimeOffset.UtcNow;
+                await _context.SaveChangesAsync();
+
+                // Send response
+                return new AuthenticateKeyResponse
+                {
+                    IsValid = true,
+                    Id = match.Id,
+                    Tier = match.Tier,
+                    IpWhitelist = match.IpWhitelist
+                };
+            }
+            
+            _logger.LogWarning("API key authentication failed");
+            
+            return new AuthenticateKeyResponse
+            {
+                IsValid = false,
+                Reason = "Invalid or expired key"
+            };
+            
+        }
+        catch (DbException ex) 
+        {
+            _logger.LogError(ex, "Database error while authenticating key");
+            throw new InvalidOperationException("Database error while authenticating key", ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while authenticating key");
+            throw new InvalidOperationException("An unexpected error occurred while authenticating key", ex);
+        }
+
+    }
+
     public async Task<ValidateKeyResult> ValidateKeyAsync(ValidateKeyRequest request)
     {
         _logger.LogInformation("Validating API key");
@@ -143,10 +203,6 @@ public class ApiKeyService : IApiKeyService
                 
                 _logger.LogDebug("API key validated successfully: ID = {KeyId}, Name = {Name}", 
                     match.Id, match.Name);
-                
-                // Update LastUsedAt field for key
-                match.LastUsedAt = DateTimeOffset.UtcNow;
-                await _context.SaveChangesAsync();
                 
                 // Send response
                 return new ValidateKeyResult

@@ -127,6 +127,20 @@ public class ApiKeyService : IApiKeyService
             
             if (match != null)
             {
+                
+                if (match.ExpiresAt != null && match.ExpiresAt <= DateTimeOffset.UtcNow)
+                {
+                    _logger.LogInformation(
+                        "API key expired: ID = {KeyId}, Name = {Name}, ExpiresAt = {ExpiresAt}",
+                        match.Id, match.Name, match.ExpiresAt);
+
+                    return new ValidateKeyResult
+                    {
+                        IsValid = false,
+                        Reason = "Key expired"
+                    };
+                }
+                
                 _logger.LogDebug("API key validated successfully: ID = {KeyId}, Name = {Name}", 
                     match.Id, match.Name);
                 

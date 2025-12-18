@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using mithrandir.Models.DTOs;
 
@@ -75,7 +76,24 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task AddToWhitelist_WithInvalidIp_ReturnsBadRequest()
     {
-        // Arrange, act, assert
+        // Arrange
+        _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
+        var request = new
+        {
+            Key = "Invalid IP Add To Whitelist Test Key",
+            IpAddress = "999.999.999.999"
+        };
+        
+        // Assert
+        var response = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", request);
+        _client.DefaultRequestHeaders.Remove("X-Admin-Key");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var result = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();                                                                
+        Assert.NotNull(result);                                                                                                                           
+        Assert.Contains("IpAddress", result.Errors.Keys);                                                                                                 
+        Assert.Contains("Invalid IP address", result.Errors["IpAddress"].First());    
     }
 
     [Fact]

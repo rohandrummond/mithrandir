@@ -1,7 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,27 +9,11 @@ using mithrandir.Models.DTOs;
 
 namespace mithrandir.Tests;
 
-public class FakeIpStartupFilter : IStartupFilter
-{
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
-    {
-        return app =>
-        {
-            app.Use(async (context, nextMiddleware) =>
-            {
-                context.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
-                await nextMiddleware();
-            });
-            next(app);
-        };
-    }
-}
-
 public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
     private readonly WebApplicationFactory<Program> _factory;
-    private const string TestIp = "127.0.0.1";
+    private const string TestIp = CustomWebApplicationFactory.TestIp;
     
     public ValidateKeyTests(CustomWebApplicationFactory factory)
     { 

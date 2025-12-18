@@ -85,7 +85,7 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
             IpAddress = "999.999.999.999"
         };
         
-        // Assert
+        // Act
         var response = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", request);
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
         
@@ -145,7 +145,38 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task AddToWhitelist_WithValidIp_ReturnsSuccess()
     {
-        // Arrange, act assert
+        // Arrange
+        
+        // Generate key
+        _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
+        var generateKeyRequest = new GenerateKeyRequest
+        {
+            Name = "Valid Add To Whitelist Test Key",
+            Tier = Tier.Free
+        };
+        var generateKeyResponse = await _client .PostAsJsonAsync("/api/admin/keys/generate", generateKeyRequest);
+        Assert.Equal(HttpStatusCode.OK, generateKeyResponse.StatusCode);
+        var generateKeyResult = await generateKeyResponse.Content.ReadFromJsonAsync<GenerateKeyResponse>(); 
+        Assert.NotNull(generateKeyResult);
+        
+        // Add to whitelist
+        var addToWhitelistRequest = new AddToWhitelistRequest
+        {
+            Key = generateKeyResult.Key,
+            IpAddress = TestIp
+        };
+        
+        // Act
+        var response  = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", addToWhitelistRequest);
+        _client.DefaultRequestHeaders.Remove("X-Admin-Key");
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var addToWhitelistResult = await response.Content.ReadFromJsonAsync<AddToWhitelistResponse>();
+        Assert.NotNull(addToWhitelistResult);
+        Assert.True(addToWhitelistResult.Success);
+        Assert.NotNull(addToWhitelistResult.WhitelistedIps);
+        
     }
     
 }

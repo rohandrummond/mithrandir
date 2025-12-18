@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using mithrandir.Models;
 using mithrandir.Models.DTOs;
 
 namespace mithrandir.Tests;
@@ -99,7 +100,46 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task AddToWhitelist_WithDuplicateIp_ReturnsMessage()
     {
-        // Arrange, act, assert
+        // Arrange
+        
+        // Generate key
+        _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
+        var generateKeyRequest = new GenerateKeyRequest
+        {
+            Name = "Duplicate IP Add To Whitelist Test Key",
+            Tier = Tier.Free
+        };
+        var generateKeyResponse = await _client .PostAsJsonAsync("/api/admin/keys/generate", generateKeyRequest);
+        Assert.Equal(HttpStatusCode.OK, generateKeyResponse.StatusCode);
+        var generateKeyResult = await generateKeyResponse.Content.ReadFromJsonAsync<GenerateKeyResponse>(); 
+        Assert.NotNull(generateKeyResult);
+
+        // Add first IP address
+        var firstIpRequest = new AddToWhitelistRequest
+        {
+            Key = generateKeyResult.Key,
+            IpAddress = TestIp
+        };
+        var firstIpResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", firstIpRequest);
+        Assert.Equal(HttpStatusCode.OK, firstIpResponse.StatusCode);
+        
+        // Create request for second IP address
+        var secondIpRequest = new AddToWhitelistRequest
+        {
+            Key = generateKeyResult.Key,
+            IpAddress = TestIp
+        };
+
+        // Act
+        var secondIpResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", secondIpRequest);
+        _client.DefaultRequestHeaders.Remove("X-Admin-Key");
+        Assert.Equal(HttpStatusCode.OK, secondIpResponse.StatusCode);
+        
+        // Assert
+        var secondIpResult = await secondIpResponse.Content.ReadFromJsonAsync<AddToWhitelistResponse>();
+        Assert.NotNull(secondIpResult);
+        Assert.False(secondIpResult.Success);
+        Assert.NotNull(secondIpResult.Message);
     }
 
     [Fact]

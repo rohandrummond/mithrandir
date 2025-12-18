@@ -1,3 +1,5 @@
+namespace mithrandir.Models.DTOs;
+
 public class RevokeKeyResponse
 {
     public bool Success { get; set; }

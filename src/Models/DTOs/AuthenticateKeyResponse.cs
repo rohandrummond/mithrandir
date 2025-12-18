@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+
 namespace mithrandir.Models.DTOs;
 
 public class AuthenticateKeyResponse

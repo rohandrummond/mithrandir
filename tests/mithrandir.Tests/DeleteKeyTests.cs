@@ -19,6 +19,27 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
+    public async Task DeleteKey_WithoutAdminKey_ReturnsUnauthorized()
+    {
+        // Arrange
+        var requestBody = new DeleteKeyRequest
+        {
+            Key = "Without Admin Key Delete Test Key"
+        };
+        
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Delete, "/api/admin/keys/delete")
+        {
+            Content = JsonContent.Create(requestBody)
+        };
+        var response = await _client.SendAsync(request);   
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        
+    }
+
+    [Fact]
     public async Task DeleteKey_DeletesKeySuccessfully()
     {
         // Arrange

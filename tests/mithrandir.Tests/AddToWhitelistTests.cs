@@ -171,12 +171,23 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
         
         // Assert
+        
+        // Verify response from server
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var addToWhitelistResult = await response.Content.ReadFromJsonAsync<AddToWhitelistResponse>();
         Assert.NotNull(addToWhitelistResult);
         Assert.True(addToWhitelistResult.Success);
         Assert.NotNull(addToWhitelistResult.WhitelistedIps);
         
+        // Verify subsequent requests succeed
+        _client.DefaultRequestHeaders.Add("X-Api-Key", generateKeyResult.Key);
+        var validateRequest = new ValidateKeyRequest
+        {
+            Key = generateKeyResult.Key,
+        };
+        var validateResponse = await _client.PostAsJsonAsync("/api/keys/validate", validateRequest);
+        Assert.Equal(HttpStatusCode.OK, validateResponse.StatusCode);
+        _client.DefaultRequestHeaders.Remove("X-Api-Key");
     }
     
 }

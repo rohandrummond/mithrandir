@@ -40,6 +40,32 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
+    public async Task DeleteKey_WithInvalidKey_IndicatesFailedRequest()
+    {
+        // Arrange 
+        _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
+        var requestBody = new DeleteKeyRequest
+        {
+            Key = "Invalid Key Delete Test Key"
+        };
+        
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Delete, "/api/admin/keys/delete")
+        {
+            Content = JsonContent.Create(requestBody)
+        };
+        var response = await _client.SendAsync(request);   
+        _client.DefaultRequestHeaders.Remove("X-Admin-Key");
+        
+        // Assert 
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result =  await response.Content.ReadFromJsonAsync<DeleteKeyResponse>();
+        Assert.NotNull(result);
+        Assert.False(result.Success);
+        Assert.NotNull(result.Message);
+    }
+
+    [Fact]
     public async Task DeleteKey_DeletesKeySuccessfully()
     {
         // Arrange

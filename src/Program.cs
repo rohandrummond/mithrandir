@@ -52,7 +52,11 @@ public partial class Program
             app.UseSwaggerUI();
         }
 
-        // app.UseHttpsRedirection(); [ENABLE IN PROD]
+        // Enable HTTPS redirection in production
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
 
         // Register middleware
         app.UseMiddleware<RequestLoggingMiddleware>();

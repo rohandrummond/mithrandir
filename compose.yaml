@@ -4,9 +4,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: rohan
-      POSTGRES_PASSWORD: britt
-      POSTGRES_DB: mithrandirdb
+      POSTGRES_USER: ${POSTGRES_USER:-rohan}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required}
+      POSTGRES_DB: ${POSTGRES_DB:-mithrandirdb}
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
   redis:

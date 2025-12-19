@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,7 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
             {
                 error = "Admin key not configured on server"
             });
+            return;
         }
 
         // Check if the request has the X-Admin-Key header
@@ -34,11 +37,14 @@ public class RequireAdminKeyAttribute : Attribute, IAuthorizationFilter
         }
 
         // Compare provided key with configured admin key
-        if (providedKey != adminKey)
+        // Constant time comparisom used to prevent timing attacks
+        var providedBytes = Encoding.UTF8.GetBytes(providedKey!);
+        var adminBytes = Encoding.UTF8.GetBytes(adminKey);
+        if (!CryptographicOperations.FixedTimeEquals(providedBytes, adminBytes))
         {
-            context.Result = new UnauthorizedObjectResult(new 
-            { 
-                error = "Invalid admin key" 
+            context.Result = new UnauthorizedObjectResult(new
+            {
+                error = "Invalid admin key"
             });
             return;
         }

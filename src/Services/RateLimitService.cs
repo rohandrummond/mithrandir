@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Options;
 using mithrandir.Models;
 using mithrandir.Models.DTOs;
+using mithrandir.Options;
 using StackExchange.Redis;
 
 namespace mithrandir.Services;
@@ -8,11 +10,21 @@ public class RateLimitService : IRateLimitService
 {
     private readonly IConnectionMultiplexer _redis;
     private readonly ILogger<RateLimitService> _logger;
+    private readonly RateLimitOptions _options;
+    private readonly TimeProvider _timeProvider;
+    
 
-    public RateLimitService(IConnectionMultiplexer redis, ILogger<RateLimitService> logger)
+    public RateLimitService(
+        IConnectionMultiplexer redis, 
+        ILogger<RateLimitService> logger,
+        IOptions<RateLimitOptions> options,
+        TimeProvider timeProvider
+        )
     {
         _redis = redis;
         _logger = logger;
+        _options = options.Value;
+        _timeProvider = timeProvider;
     }
     
     public async Task<RateLimitResult> CheckAndIncrementAsync(string keyHash, Tier tier)
@@ -23,8 +35,8 @@ public class RateLimitService : IRateLimitService
         var db = _redis.GetDatabase();
         
         // Calculate current time block with rounded minutes
-        var now = DateTime.UtcNow;
-        var minutes = (now.Minute / 10) * 10;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
+        var minutes = (now.Minute / _options.WindowMinutes) * _options.WindowMinutes;
         var timeBlock = new DateTimeOffset(
             now.Year, 
             now.Month, 
@@ -45,7 +57,7 @@ public class RateLimitService : IRateLimitService
         if (requestCount == 1)
         {
             _logger.LogDebug("First request in window, setting expiry: Key = {RedisKey}", redisKey);
-            await db.KeyExpireAsync(redisKey, TimeSpan.FromMinutes(10));
+            await db.KeyExpireAsync(redisKey, TimeSpan.FromMinutes(_options.WindowMinutes));
         }
         else
         {
@@ -53,13 +65,13 @@ public class RateLimitService : IRateLimitService
         }
         
         // Set limit based on Tier
-        var limit = tier == Tier.Free ? 10 : 50;
+        var limit = tier == Tier.Free ? _options.FreeTierLimit : _options.ProTierLimit;
         
         // Check if request count is within limit
         var withinLimit = requestCount <= limit;
         
         // Compute how many minutes until reset
-        var resetTime = timeBlock.AddMinutes(10);
+        var resetTime = timeBlock.AddMinutes(_options.WindowMinutes);
         var remaining = resetTime - now;
         var retryAfterSeconds = (int)Math.Ceiling(remaining.TotalSeconds);
         

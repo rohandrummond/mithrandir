@@ -3,6 +3,7 @@ using StackExchange.Redis;
 using mithrandir.Data;
 using mithrandir.Services;
 using mithrandir.Middleware;
+using mithrandir.Options;
 
 public partial class Program
 {
@@ -26,6 +27,13 @@ public partial class Program
             
             return ConnectionMultiplexer.Connect(connectionString);
         });
+        
+        // Rate limiting options
+        builder.Services.Configure<RateLimitOptions>(
+            builder.Configuration.GetSection(RateLimitOptions.SectionName));
+
+        // Time provider (for testing)
+        builder.Services.AddSingleton(TimeProvider.System);
 
         // Inject API key service
         builder.Services.AddScoped<IApiKeyService, ApiKeyService>();

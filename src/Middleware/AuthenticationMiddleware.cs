@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using mithrandir.Services;
 using mithrandir.Models.DTOs;
+using mithrandir.Utilities;
 
 namespace mithrandir.Middleware;
 
@@ -58,27 +59,25 @@ public class AuthenticationMiddleware
         }
         
         // Check IP whitelist
-        // Use X-Forwarded-For header for proxy requests, otherwise use fallback
-        var clientIp = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',')[0].Trim()
-            ?? context.Connection.RemoteIpAddress?.ToString();
-        
+        var clientIp = IpAddressHelper.GetClientIp(context);
+
         if (string.IsNullOrEmpty(clientIp))
         {
             _logger.LogWarning("Authentication failed due inability to determine client IP. Key ID = {KeyId}",
                 result.Id);
-            
+
             // Handle undetermined client IP
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("Unable to determine client IP address");
             return;
         }
-        
-        if (result.IpWhitelist == null || !result.IpWhitelist.Contains(clientIp))
+
+        if (!IpAddressHelper.IsInWhitelist(clientIp, result.IpWhitelist))
         {
             _logger.LogWarning("Authentication failed due to IP not being whitelisted. Key ID = {KeyId},  Client IP = {ClientIp}",
                 result.Id , clientIp);
-            
+
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("IP address has not been whitelisted");

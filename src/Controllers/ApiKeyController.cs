@@ -34,12 +34,12 @@ namespace mithrandir.Controllers
                 };
                 return Ok(response);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 // Return error
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
-            
+
         }
 
         // Revoke an API key
@@ -58,13 +58,13 @@ namespace mithrandir.Controllers
                 var result = await _keyService.RevokeKeyAsync(request);
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 // Return error
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
-        
+
         // Get usage for API key
         [HttpPost("usage")]
         public async Task<IActionResult> GetUsage([FromBody] GetUsageRequest request)
@@ -85,14 +85,14 @@ namespace mithrandir.Controllers
                 
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
-        
+
     }
-    
+
     // Admin only controller
     [ApiController]
     [Route("api/admin/keys")]
@@ -131,13 +131,13 @@ namespace mithrandir.Controllers
                 var result = await _keyService.GenerateKeyAsync(request);
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 // Return error
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
-        
+
         // Delete an API key
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
@@ -154,12 +154,12 @@ namespace mithrandir.Controllers
                 var result = await _keyService.DeleteKeyAsync(request);
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
-        
+
         // Add IP address to whitelist
         [HttpPost("whitelist/add")]
         public async Task<IActionResult> AddToWhitelist([FromBody] AddToWhitelistRequest request)
@@ -174,9 +174,9 @@ namespace mithrandir.Controllers
                 var result = await _keyService.AddToWhitelistAsync(request);
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
 
@@ -194,9 +194,9 @@ namespace mithrandir.Controllers
                 var result = await _keyService.RemoveFromWhitelistAsync(request);
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(500, new { error = "An unexpected error occurred" });
             }
         }
     }

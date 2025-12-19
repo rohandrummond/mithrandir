@@ -4,6 +4,7 @@ using mithrandir.Data;
 using mithrandir.Services;
 using mithrandir.Models;
 using mithrandir.Models.DTOs;
+using mithrandir.Utilities;
 
 namespace mithrandir.Middleware;
 
@@ -28,8 +29,7 @@ public class RateLimitingMiddleware
         if (isAdminRoute)
         {
             // Rate limit admin routes by IP
-            var adminClientIp = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',')[0].Trim()
-                ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var adminClientIp = IpAddressHelper.GetClientIp(context) ?? "unknown";
 
             var adminResult = await rateLimitService.CheckAndIncrementAsync($"admin:{adminClientIp}", Tier.Pro);
 
@@ -90,8 +90,7 @@ public class RateLimitingMiddleware
         
         // Capture usage before next middleware
         var apiKeyId = context.Items["Id"] as int?;
-        var ipAddress = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',')[0].Trim()
-            ?? context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var ipAddress = IpAddressHelper.GetClientIp(context) ?? "Unknown";
         var endpoint = context.Request.Path.ToString();
         var timestamp = DateTimeOffset.UtcNow;
 

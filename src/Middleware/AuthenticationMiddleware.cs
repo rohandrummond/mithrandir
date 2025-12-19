@@ -58,7 +58,9 @@ public class AuthenticationMiddleware
         }
         
         // Check IP whitelist
-        var clientIp = context.Connection.RemoteIpAddress?.ToString();
+        // Use X-Forwarded-For header for proxy requests, otherwise use fallback
+        var clientIp = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',')[0].Trim()
+            ?? context.Connection.RemoteIpAddress?.ToString();
         
         if (string.IsNullOrEmpty(clientIp))
         {

@@ -82,15 +82,15 @@ public class RateLimitService : IRateLimitService
         }
         else
         {
-            _logger.LogDebug("Rate limit check passed: Tier = {Tier}, Count = {RequestCount}, Limit = {Limit}, Remaining = {Remaining}", 
-                tier, requestCount, limit, limit - (int)requestCount);
+            _logger.LogDebug("Rate limit check passed: Tier = {Tier}, Count = {RequestCount}, Limit = {Limit}, Remaining = {Remaining}",
+                tier, requestCount, limit, Math.Max(0, limit - (int)requestCount));
         }
-        
+
         // Return result
         return new RateLimitResult
         {
             Allowed = withinLimit,
-            Remaining = limit - (int)requestCount, 
+            Remaining = Math.Max(0, limit - (int)requestCount),
             RetryAfterSeconds = retryAfterSeconds
         };
     }

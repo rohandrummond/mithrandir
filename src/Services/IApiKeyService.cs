@@ -12,4 +12,5 @@ public interface IApiKeyService
     Task<AddToWhitelistResponse>  AddToWhitelistAsync(AddToWhitelistRequest request);
     Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request);
     Task<GetUsageResponse?> GetUsageAsync(GetUsageRequest request);
+    Task<GetAllKeysResponse> GetAllKeysAsync();
 }

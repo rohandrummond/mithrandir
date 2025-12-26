@@ -99,9 +99,28 @@ namespace mithrandir.Controllers
     [RequireAdminKey]
     public class AdminKeysController(IApiKeyService keyService)  : ControllerBase
     {
-        
+
         private readonly IApiKeyService _keyService = keyService;
-        
+
+        // Get all API keys
+        [HttpGet]
+        public async Task<IActionResult> GetAllKeys()
+        {
+            try
+            {
+                var result = await _keyService.GetAllKeysAsync();
+                return Ok(result);
+            }
+            catch (InvalidOperationException)
+            {
+                return StatusCode(500, new GetAllKeysResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while retrieving API keys"
+                });
+            }
+        }
+
         // Generate an API key
         [HttpPost("generate")]
         public async Task<IActionResult> GenerateKey([FromBody] GenerateKeyRequest request)

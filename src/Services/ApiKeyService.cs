@@ -470,6 +470,46 @@ public class ApiKeyService : IApiKeyService
         }
     }
 
+    public async Task<GetAllKeysResponse> GetAllKeysAsync()
+    {
+        _logger.LogInformation("Retrieving all API keys");
+
+        try
+        {
+            var keys = await _context.ApiKeys
+                .Select(k => new ApiKeyDto
+                {
+                    Id = k.Id,
+                    Name = k.Name,
+                    Tier = k.Tier,
+                    Status = k.Status,
+                    IpWhitelist = k.IpWhitelist,
+                    CreatedAt = k.CreatedAt,
+                    ExpiresAt = k.ExpiresAt,
+                    LastUsedAt = k.LastUsedAt
+                })
+                .ToListAsync();
+
+            _logger.LogInformation("Retrieved {Count} API keys", keys.Count);
+
+            return new GetAllKeysResponse
+            {
+                Success = true,
+                Keys = keys
+            };
+        }
+        catch (DbException ex)
+        {
+            _logger.LogError(ex, "Database error while retrieving all API keys");
+            throw new InvalidOperationException("Database error while retrieving API keys", ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error while retrieving all API keys");
+            throw new InvalidOperationException("Unexpected error while retrieving API keys", ex);
+        }
+    }
+
     public async Task<GetUsageResponse?> GetUsageAsync(GetUsageRequest request)
     {
         _logger.LogInformation("Retrieving usage data for API key");

@@ -59,9 +59,10 @@ public class GetAllKeysTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task GetAllKeys_ReturnsCreatedKeys()
     {
-        // Arrange - Create a key first
+        // Arrange 
         _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
 
+        // Create key
         var createRequest = new GenerateKeyRequest
         {
             Name = "GetAllKeys Test Key",
@@ -83,7 +84,7 @@ public class GetAllKeysTests : IClassFixture<CustomWebApplicationFactory>
         Assert.True(result.Success);
         Assert.NotNull(result.Keys);
 
-        // Verify the created key is in the response
+        // Verify new key is in response
         var matchingKey = result.Keys.Find(k => k.Name == "GetAllKeys Test Key");
         Assert.NotNull(matchingKey);
         Assert.Equal(Tier.Pro, matchingKey.Tier);
@@ -99,7 +100,7 @@ public class GetAllKeysTests : IClassFixture<CustomWebApplicationFactory>
         // Create a key
         var createRequest = new GenerateKeyRequest
         {
-            Name = "KeyHash Security Test Key",
+            Name = "Hash Security Test Key",
             Tier = Tier.Free
         };
         await _client.PostAsJsonAsync("/api/admin/keys/generate", createRequest);
@@ -111,7 +112,7 @@ public class GetAllKeysTests : IClassFixture<CustomWebApplicationFactory>
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        // Verify raw response doesn't contain KeyHash
+        // Verify response doesn't contain KeyHash
         var rawContent = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("KeyHash", rawContent);
         Assert.DoesNotContain("keyHash", rawContent);

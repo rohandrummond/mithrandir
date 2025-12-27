@@ -24,6 +24,7 @@ import { KeyTableToolbar } from './key-table-toolbar'
 import { KeyTablePagination } from './key-table-pagination'
 import { DeleteKeyDialog } from './delete-key-dialog'
 import { WhitelistDialog } from './whitelist-dialog'
+import { GenerateKeyDialog } from './generate-key-dialog'
 
 export function KeyTable() {
   const { data, error, isLoading } = useApiKeys()
@@ -32,6 +33,7 @@ export function KeyTable() {
   const [selectedKey, setSelectedKey] = useState<ApiKey | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [whitelistDialogOpen, setWhitelistDialogOpen] = useState(false)
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false)
 
   const handleDelete = (apiKey: ApiKey) => {
     setSelectedKey(apiKey)
@@ -109,8 +111,10 @@ export function KeyTable() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold mb-8">API Keys</h1>
-      <KeyTableToolbar table={table} />
+      <KeyTableToolbar
+        table={table}
+        onGenerateKey={() => setGenerateDialogOpen(true)}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -174,6 +178,15 @@ export function KeyTable() {
         apiKey={selectedKey}
         onAddIp={handleAddIp}
         onRemoveIp={handleRemoveIp}
+      />
+
+      <GenerateKeyDialog
+        open={generateDialogOpen}
+        onOpenChange={setGenerateDialogOpen}
+        onSuccess={() => {
+          // TO DO (Refresh table by calling mutate after creation)
+          console.log('Key generated successfully')
+        }}
       />
     </div>
   )

@@ -4,12 +4,12 @@ import { GitHubLogoIcon } from '@radix-ui/react-icons'
 export default function Nav() {
   return (
     <div className="flex flex-row items-center justify-between p-6">
-      <Link href="/" className="font-bold text-xl">
-        Mithrandir
+      <Link href="/" className="font-bold">
+        mithrandir
       </Link>
       <div className="flex flex-row items-center gap-5">
         <a
-          href={`${process.env.DOTNET_PUBLIC_URL}/swagger/index.html`}
+          href={`${process.env.NEXT_PUBLIC_DOTNET_API_URL}/swagger/index.html`}
           target="_blank"
           rel="noopener noreferrer"
         >

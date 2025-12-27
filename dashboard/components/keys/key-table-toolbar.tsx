@@ -19,7 +19,10 @@ interface KeyTableToolbarProps {
   onGenerateKey: () => void
 }
 
-export function KeyTableToolbar({ table, onGenerateKey }: KeyTableToolbarProps) {
+export function KeyTableToolbar({
+  table,
+  onGenerateKey,
+}: KeyTableToolbarProps) {
   const nameFilter = (table.getColumn('name')?.getFilterValue() as string) ?? ''
   const tierFilter =
     (table.getColumn('tier')?.getFilterValue() as string) ?? 'all'
@@ -30,7 +33,7 @@ export function KeyTableToolbar({ table, onGenerateKey }: KeyTableToolbarProps) 
     <>
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-3xl font-bold">API Keys</h1>
-        <Button onClick={onGenerateKey}>
+        <Button onClick={onGenerateKey} className="cursor-pointer">
           <Plus className="w-4 h-4" />
           Generate new key
         </Button>
@@ -56,7 +59,7 @@ export function KeyTableToolbar({ table, onGenerateKey }: KeyTableToolbarProps) 
                 ?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="cursor-pointer">
               <SelectValue placeholder="Tier" />
             </SelectTrigger>
             <SelectContent>
@@ -73,7 +76,7 @@ export function KeyTableToolbar({ table, onGenerateKey }: KeyTableToolbarProps) 
                 ?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="cursor-pointer">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>

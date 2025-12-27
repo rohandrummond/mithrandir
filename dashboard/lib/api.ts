@@ -54,5 +54,6 @@ export const api = {
     apiFetch<T>(endpoint, { method: 'POST', body }),
   put: <T>(endpoint: string, body: unknown) =>
     apiFetch<T>(endpoint, { method: 'PUT', body }),
-  delete: <T>(endpoint: string) => apiFetch<T>(endpoint, { method: 'DELETE' }),
+  delete: <T>(endpoint: string, body?: unknown) =>
+    apiFetch<T>(endpoint, { method: 'DELETE', body }),
 }

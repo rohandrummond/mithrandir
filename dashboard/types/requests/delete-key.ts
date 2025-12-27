@@ -1,3 +1,3 @@
 export interface DeleteKeyRequest {
-  key: string
+  id: number
 }

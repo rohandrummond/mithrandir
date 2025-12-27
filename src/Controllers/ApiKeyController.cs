@@ -161,10 +161,10 @@ namespace mithrandir.Controllers
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteKey([FromBody] DeleteKeyRequest request)
         {
-            // Check that key is not null
-            if (string.IsNullOrEmpty(request.Key))
+            // Check that ID is valid
+            if (request.Id <= 0)
             {
-                return BadRequest("Key is required");
+                return BadRequest("Valid Id is required");
             }
 
             try

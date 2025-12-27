@@ -288,18 +288,18 @@ public class ApiKeyService : IApiKeyService
 
         try
         {
-            // Search for key
-            var match= await FindKeyAsync(request.Key, true);
+            // Find key by ID
+            var match = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == request.Id);
 
             // Return error if not found
             if (match == null)
             {
-                _logger.LogWarning("Cannot delete API key because key not found or already deleted");
-                
+                _logger.LogWarning("Cannot delete API key because key with ID {KeyId} not found", request.Id);
+
                 return new DeleteKeyResponse()
                 {
                     Success = false,
-                    Message = "Key not found or already deleted"
+                    Message = "Key not found"
                 };
             }
 

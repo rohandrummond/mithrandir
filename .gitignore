@@ -65,6 +65,7 @@ appsettings.*.json
 
 # Claude
 CLAUDE.md
+PLAN.md
 
 # JetBrains Rider
 .idea/

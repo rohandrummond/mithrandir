@@ -1,14 +1,12 @@
-'use client'
-
-import { useApiKeys } from '@/hooks/use-api-keys'
+import { KeyTable } from '@/components/keys/key-table'
 
 export default function Home() {
-  const { data, error, isLoading } = useApiKeys()
-
-  console.log('Data: ', data)
-
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error loading keys</div>
-
-  return <div>{data?.keys.length} keys found</div>
+  return (
+    <div className="container py-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">API Keys</h1>
+      </div>
+      <KeyTable />
+    </div>
+  )
 }

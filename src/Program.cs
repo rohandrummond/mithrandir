@@ -40,7 +40,12 @@ public partial class Program
         builder.Services.AddScoped<IRateLimitService, RateLimitService>();
 
         // Framework services
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(
+                    new System.Text.Json.Serialization.JsonStringEnumConverter());
+            });
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();

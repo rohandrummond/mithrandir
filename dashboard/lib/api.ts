@@ -1,6 +1,6 @@
 import { getEnvironmentVariable } from './utils'
 
-const API_URL = getEnvironmentVariable('NEXT_PUBLIC_API_URL')
+const API_URL = getEnvironmentVariable('NEXT_PUBLIC_DOTNET_API_URL')
 const ADMIN_API_KEY = getEnvironmentVariable('ADMIN_API_KEY')
 
 if (!ADMIN_API_KEY) {

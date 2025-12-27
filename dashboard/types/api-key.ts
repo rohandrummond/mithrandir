@@ -2,7 +2,7 @@ import { Status, Tier } from "./enums";
 
 export interface ApiKey {
   id: number;
-  keyHash: string;
+  keyHash?: string;
   name: string;
   tier: Tier;
   status: Status;

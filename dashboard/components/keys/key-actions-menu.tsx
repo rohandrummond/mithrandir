@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { MoreHorizontal, Trash2, Shield } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Trash2, ShieldCheck } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ApiKey } from '@/types/api-key';
+} from '@/components/ui/dropdown-menu'
+import { ApiKey } from '@/types/api-key'
 
 interface KeyActionsMenuProps {
-  apiKey: ApiKey;
-  onDelete: (apiKey: ApiKey) => void;
-  onManageWhitelist: (apiKey: ApiKey) => void;
+  apiKey: ApiKey
+  onDelete: (apiKey: ApiKey) => void
+  onManageWhitelist: (apiKey: ApiKey) => void
 }
 
 export function KeyActionsMenu({
@@ -29,16 +29,19 @@ export function KeyActionsMenu({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="p-2 pr-3">
         <DropdownMenuItem onClick={() => onManageWhitelist(apiKey)}>
-          <Shield />
+          <ShieldCheck />
           Manage Whitelist
         </DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onClick={() => onDelete(apiKey)}>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={() => onDelete(apiKey)}
+        >
           <Trash2 />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

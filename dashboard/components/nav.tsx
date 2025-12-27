@@ -20,7 +20,7 @@ export default function Nav() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <GitHubLogoIcon className="w-[20px] h-[20px]" />
+          <GitHubLogoIcon className="w-[22px] h-[22px]" />
         </a>
       </div>
     </div>

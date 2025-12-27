@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import {
   Dialog,
@@ -7,15 +7,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ApiKey } from '@/types/api-key';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { ApiKey } from '@/types/api-key'
 
 interface DeleteKeyDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  apiKey: ApiKey | null;
-  onConfirm: () => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  apiKey: ApiKey | null
+  onConfirm: () => void
 }
 
 export function DeleteKeyDialog({
@@ -25,19 +25,19 @@ export function DeleteKeyDialog({
   onConfirm,
 }: DeleteKeyDialogProps) {
   const handleConfirm = () => {
-    console.log('Delete key:', apiKey?.id);
-    onConfirm();
-    onOpenChange(false);
-  };
+    console.log('Delete key:', apiKey?.id)
+    onConfirm()
+    onOpenChange(false)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="py-7 px-8">
         <DialogHeader>
           <DialogTitle>Delete API Key</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete the API key &quot;{apiKey?.name}&quot;? This
-            action cannot be undone.
+            Are you sure you want to delete the API key &quot;{apiKey?.name}
+            &quot;? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -50,5 +50,5 @@ export function DeleteKeyDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

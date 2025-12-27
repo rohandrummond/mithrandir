@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState } from 'react'
+import { X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ApiKey } from '@/types/api-key';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ApiKey } from '@/types/api-key'
 
 interface WhitelistDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  apiKey: ApiKey | null;
-  onAddIp: (ip: string) => void;
-  onRemoveIp: (ip: string) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  apiKey: ApiKey | null
+  onAddIp: (ip: string) => void
+  onRemoveIp: (ip: string) => void
 }
 
 export function WhitelistDialog({
@@ -28,38 +28,38 @@ export function WhitelistDialog({
   onAddIp,
   onRemoveIp,
 }: WhitelistDialogProps) {
-  const [newIp, setNewIp] = useState('');
+  const [newIp, setNewIp] = useState('')
 
   const handleAddIp = () => {
     if (newIp.trim()) {
-      console.log('Add IP:', newIp.trim(), 'to key:', apiKey?.id);
-      onAddIp(newIp.trim());
-      setNewIp('');
+      console.log('Add IP:', newIp.trim(), 'to key:', apiKey?.id)
+      onAddIp(newIp.trim())
+      setNewIp('')
     }
-  };
+  }
 
   const handleRemoveIp = (ip: string) => {
-    console.log('Remove IP:', ip, 'from key:', apiKey?.id);
-    onRemoveIp(ip);
-  };
+    console.log('Remove IP:', ip, 'from key:', apiKey?.id)
+    onRemoveIp(ip)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddIp();
+      e.preventDefault()
+      handleAddIp()
     }
-  };
+  }
 
-  const whitelist = apiKey?.ipWhitelist ?? [];
+  const whitelist = apiKey?.ipWhitelist ?? []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="py-7 px-8">
         <DialogHeader>
           <DialogTitle>Manage IP Whitelist</DialogTitle>
           <DialogDescription>
-            Manage whitelisted IP addresses for &quot;{apiKey?.name}&quot;. Only these
-            IPs will be allowed to use this API key.
+            Manage whitelisted IP addresses for &quot;{apiKey?.name}&quot;. Only
+            these IPs will be allowed to use this API key.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -101,5 +101,5 @@ export function WhitelistDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

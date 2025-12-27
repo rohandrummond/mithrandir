@@ -44,17 +44,17 @@ export function KeyTable() {
   }
 
   const handleConfirmDelete = () => {
-    // Placeholder - will be implemented with actual API call
+    // TO DO
     console.log('Confirmed delete for key:', selectedKey?.id)
   }
 
   const handleAddIp = (ip: string) => {
-    // Placeholder - will be implemented with actual API call
+    // TO DO
     console.log('Add IP:', ip, 'to key:', selectedKey?.id)
   }
 
   const handleRemoveIp = (ip: string) => {
-    // Placeholder - will be implemented with actual API call
+    // TO DO
     console.log('Remove IP:', ip, 'from key:', selectedKey?.id)
   }
 
@@ -109,6 +109,7 @@ export function KeyTable() {
 
   return (
     <div className="space-y-4">
+      <h1 className="text-2xl font-bold mb-8">API Keys</h1>
       <KeyTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>

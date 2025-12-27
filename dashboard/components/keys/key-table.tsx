@@ -27,7 +27,7 @@ import { WhitelistDialog } from './whitelist-dialog'
 import { GenerateKeyDialog } from './generate-key-dialog'
 
 export function KeyTable() {
-  const { data, error, isLoading } = useApiKeys()
+  const { data, error, isLoading, mutate } = useApiKeys()
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [selectedKey, setSelectedKey] = useState<ApiKey | null>(null)
@@ -183,10 +183,7 @@ export function KeyTable() {
       <GenerateKeyDialog
         open={generateDialogOpen}
         onOpenChange={setGenerateDialogOpen}
-        onSuccess={() => {
-          // TO DO (Refresh table by calling mutate after creation)
-          console.log('Key generated successfully')
-        }}
+        onSuccess={() => mutate()}
       />
     </div>
   )

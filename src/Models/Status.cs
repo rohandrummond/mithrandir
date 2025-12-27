@@ -1,7 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace mithrandir.Models;
 
-public enum Status 
-{ 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Status
+{
   Active,
-  Revoked 
+  Revoked
 }

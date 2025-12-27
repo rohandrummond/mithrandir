@@ -80,7 +80,7 @@ public class ApiKeyService : IApiKeyService
             Tier = request.Tier,
             Status = Status.Active,
             CreatedAt = DateTimeOffset.UtcNow,
-            ExpiresAt = request.ExpiresAt,
+            ExpiresAt = request.ExpiresAt?.ToUniversalTime(),
         };
 
         try 

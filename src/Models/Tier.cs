@@ -1,7 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace mithrandir.Models;
 
-public enum Tier 
-{ 
-  Free, 
-  Pro 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Tier
+{
+  Free,
+  Pro
 }

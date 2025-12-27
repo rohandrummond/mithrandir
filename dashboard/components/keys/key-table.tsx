@@ -45,11 +45,6 @@ export function KeyTable() {
     setWhitelistDialogOpen(true)
   }
 
-  const handleConfirmDelete = () => {
-    // TO DO
-    console.log('Confirmed delete for key:', selectedKey?.id)
-  }
-
   const handleAddIp = (ip: string) => {
     // TO DO
     console.log('Add IP:', ip, 'to key:', selectedKey?.id)
@@ -169,7 +164,7 @@ export function KeyTable() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         apiKey={selectedKey}
-        onConfirm={handleConfirmDelete}
+        onSuccess={() => mutate()}
       />
 
       <WhitelistDialog

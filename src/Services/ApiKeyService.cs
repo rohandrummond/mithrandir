@@ -95,6 +95,7 @@ public class ApiKeyService : IApiKeyService
             // Return response
             return new GenerateKeyResponse
             {
+                Id = apiKey.Id,
                 Key = formattedKey,
                 Name = apiKey.Name,
                 Tier = apiKey.Tier,

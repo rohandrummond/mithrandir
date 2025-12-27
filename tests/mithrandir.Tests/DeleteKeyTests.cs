@@ -24,7 +24,7 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Arrange
         var requestBody = new DeleteKeyRequest
         {
-            Key = "Without Admin Key Delete Test Key"
+            Id = 1
         };
         
         // Act
@@ -46,7 +46,7 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
         _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
         var requestBody = new DeleteKeyRequest
         {
-            Key = "Invalid Key Delete Test Key"
+            Id = 99999
         };
         
         // Act
@@ -110,7 +110,7 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Create deletion request object
         var deleteKeyRequestBody = new DeleteKeyRequest
         {
-            Key = testKeyResult.Key,
+            Id = testKeyResult.Id,
         };
         
         // Act 

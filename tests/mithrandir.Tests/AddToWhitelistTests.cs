@@ -25,7 +25,7 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
         // Arrange, act, assert
         var request = new AddToWhitelistRequest
         {
-            Key = "Without Admin Key Add To Whitelist Test Key",
+            Id = 999,
             IpAddress = TestIp
         };
 
@@ -81,7 +81,7 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
         _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
         var request = new
         {
-            Key = "Invalid IP Add To Whitelist Test Key",
+            Id = 999,
             IpAddress = "999.999.999.999"
         };
         
@@ -117,16 +117,16 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
         // Add first IP address
         var firstIpRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         var firstIpResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", firstIpRequest);
         Assert.Equal(HttpStatusCode.OK, firstIpResponse.StatusCode);
-        
+
         // Create request for second IP address
         var secondIpRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
 
@@ -162,7 +162,7 @@ public class AddToWhitelistTests : IClassFixture<CustomWebApplicationFactory>
         // Add to whitelist
         var addToWhitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         

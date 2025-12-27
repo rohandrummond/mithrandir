@@ -55,7 +55,7 @@ public class GetUsageTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
@@ -94,7 +94,7 @@ public class GetUsageTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);

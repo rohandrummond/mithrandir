@@ -60,12 +60,12 @@ public class RateLimitTests : IClassFixture<RateLimitTestWebApplicationFactory>,
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
-        
+
         // Create request for validate endpoint
         _client.DefaultRequestHeaders.Add("X-Api-Key", generateKeyResult.Key);
         var request = new ValidateKeyRequest { Key = generateKeyResult.Key };
@@ -102,12 +102,12 @@ public class RateLimitTests : IClassFixture<RateLimitTestWebApplicationFactory>,
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
-        
+
         // Create validate request
         _client.DefaultRequestHeaders.Add("X-Api-Key", generateKeyResult.Key);
         var request = new ValidateKeyRequest { Key = generateKeyResult.Key };
@@ -162,7 +162,7 @@ public class RateLimitTests : IClassFixture<RateLimitTestWebApplicationFactory>,
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);

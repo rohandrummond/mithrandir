@@ -25,7 +25,7 @@ public class RemoveFromWhitelistTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         var request = new RemoveFromWhitelistRequest
         {
-            Key = "Without Admin Key Remove From Whitelist Test Key",
+            Id = 999,
             IpAddress = TestIp
         };
 
@@ -92,7 +92,7 @@ public class RemoveFromWhitelistTests : IClassFixture<CustomWebApplicationFactor
         _client.DefaultRequestHeaders.Add("X-Admin-Key", "test-admin-key");
         var requestBody = new RemoveFromWhitelistRequest
         {
-            Key = "Invalid IP Remove From Whitelist Test Key",
+            Id = 999,
             IpAddress = "999.999.999.999"
         };
 
@@ -131,7 +131,7 @@ public class RemoveFromWhitelistTests : IClassFixture<CustomWebApplicationFactor
         // Create remove request for IP
         var removeRequestBody = new RemoveFromWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
 
@@ -170,7 +170,7 @@ public class RemoveFromWhitelistTests : IClassFixture<CustomWebApplicationFactor
         // Add IP to whitelist first
         var addToWhitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         var addResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", addToWhitelistRequest);
@@ -179,7 +179,7 @@ public class RemoveFromWhitelistTests : IClassFixture<CustomWebApplicationFactor
         // Create remove request
         var removeRequest = new RemoveFromWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
 

@@ -86,7 +86,7 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generatedKey.Key,
+            Id = generatedKey.Id,
             IpAddress = "127.0.0.2"
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
@@ -125,13 +125,13 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generatedKey.Key,
+            Id = generatedKey.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
         Assert.Equal(HttpStatusCode.OK, whitelistResponse.StatusCode);
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
-        
+
         // Act
         _client.DefaultRequestHeaders.Add("X-Api-Key", generatedKey.Key);
         var request = new ValidateKeyRequest
@@ -167,13 +167,13 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add test IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generatedKey.Key,
+            Id = generatedKey.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
         Assert.Equal(HttpStatusCode.OK, whitelistResponse.StatusCode);
         _client.DefaultRequestHeaders.Remove("X-Admin-Key");
-        
+
         // Act
         _client.DefaultRequestHeaders.Add("X-Api-Key", generatedKey.Key);
         var validateRequest = new ValidateKeyRequest
@@ -217,10 +217,10 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
           var testKey = await testKeyResponse.Content.ReadFromJsonAsync<GenerateKeyResponse>();
           Assert.NotNull(testKey);
           
-          // Add IP to whitelist 
+          // Add IP to whitelist
           var whitelistRequest = new AddToWhitelistRequest
           {
-              Key = authKey.Key,
+              Id = authKey.Id,
               IpAddress = TestIp
           };
           var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
@@ -278,17 +278,17 @@ public class ValidateKeyTests : IClassFixture<CustomWebApplicationFactory>
       var testKey = await testKeyResponse.Content.ReadFromJsonAsync<GenerateKeyResponse>();
       Assert.NotNull(testKey);
       
-      // Add IP to whitelist 
+      // Add IP to whitelist
       var whitelistRequest = new AddToWhitelistRequest
       {
-          Key = authKey.Key,
+          Id = authKey.Id,
           IpAddress = TestIp
       };
       var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
       Assert.Equal(HttpStatusCode.OK, whitelistResponse.StatusCode);
 
       _client.DefaultRequestHeaders.Remove("X-Admin-Key");
-      
+
       // Update expiration for key directly in database
       using (var scope = _factory.Services.CreateScope())
       {

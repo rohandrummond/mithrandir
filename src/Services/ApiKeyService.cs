@@ -332,16 +332,17 @@ public class ApiKeyService : IApiKeyService
 
     public async Task<AddToWhitelistResponse> AddToWhitelistAsync(AddToWhitelistRequest request)
     {
-        _logger.LogInformation("Adding IP to whitelist: {IpAddress}", request.IpAddress);
-        
+        _logger.LogInformation("Adding IP to whitelist: Key ID = {KeyId}, IP = {IpAddress}",
+            request.Id, request.IpAddress);
+
         try
         {
-            // Find key
-            var match = await FindKeyAsync(request.Key, true);
+            // Find key by ID
+            var match = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == request.Id);
             if (match == null)
             {
-                _logger.LogWarning("Cannot add IP to whitelist because key not found");
-                
+                _logger.LogWarning("Cannot add IP to whitelist because key not found: Key ID = {KeyId}", request.Id);
+
                 return new AddToWhitelistResponse
                 {
                     Success = false,
@@ -400,20 +401,21 @@ public class ApiKeyService : IApiKeyService
     
     public async Task<RemoveFromWhitelistResponse> RemoveFromWhitelistAsync(RemoveFromWhitelistRequest request)
     {
-        _logger.LogInformation("Removing IP from whitelist: {IpAddress}", request.IpAddress);
-        
+        _logger.LogInformation("Removing IP from whitelist: Key ID = {KeyId}, IP = {IpAddress}",
+            request.Id, request.IpAddress);
+
         try
         {
-            // Find key
-            var match = await FindKeyAsync(request.Key, true);
+            // Find key by ID
+            var match = await _context.ApiKeys.FirstOrDefaultAsync(k => k.Id == request.Id);
             if (match == null)
             {
-                _logger.LogWarning("Cannot remove IP from whitelist because key not found");
+                _logger.LogWarning("Cannot remove IP from whitelist because key not found: Key ID = {KeyId}", request.Id);
 
                 return new RemoveFromWhitelistResponse
                 {
                     Success = false,
-                    Message = "Key not found or already removed"
+                    Message = "Key not found"
                 };
             }
             

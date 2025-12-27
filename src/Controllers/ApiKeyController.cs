@@ -183,9 +183,9 @@ namespace mithrandir.Controllers
         [HttpPost("whitelist/add")]
         public async Task<IActionResult> AddToWhitelist([FromBody] AddToWhitelistRequest request)
         {
-            if (string.IsNullOrEmpty(request.Key))
+            if (request.Id <= 0)
             {
-                return BadRequest("Key is required");
+                return BadRequest("Valid key ID is required");
             }
 
             try
@@ -203,9 +203,9 @@ namespace mithrandir.Controllers
         [HttpDelete("whitelist/remove")]
         public async Task<IActionResult> RemoveFromWhitelist([FromBody] RemoveFromWhitelistRequest request)
         {
-            if (string.IsNullOrEmpty(request.Key))
+            if (request.Id <= 0)
             {
-                return BadRequest("Key is required");
+                return BadRequest("Valid key ID is required");
             }
 
             try

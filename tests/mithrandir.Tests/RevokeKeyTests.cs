@@ -55,7 +55,7 @@ public class RevokeKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = generateKeyResult.Key,
+            Id = generateKeyResult.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
@@ -94,7 +94,7 @@ public class RevokeKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist for auth key
         var whitelistRequest = new AddToWhitelistRequest
         {
-            Key = authKeyResult.Key,
+            Id = authKeyResult.Id,
             IpAddress = TestIp
         };
         var whitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", whitelistRequest);
@@ -157,7 +157,7 @@ public class RevokeKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist for auth key
         var authWhitelistRequest = new AddToWhitelistRequest
         {
-            Key = authKeyResult.Key,
+            Id = authKeyResult.Id,
             IpAddress = TestIp
         };
         var authWhitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", authWhitelistRequest);
@@ -177,7 +177,7 @@ public class RevokeKeyTests : IClassFixture<CustomWebApplicationFactory>
         // Add IP to whitelist for revoke key
         var revokeWhitelistRequest = new AddToWhitelistRequest
         {
-            Key = revokeKeyResult.Key,
+            Id = revokeKeyResult.Id,
             IpAddress = TestIp
         };
         var revokeWhitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", revokeWhitelistRequest);

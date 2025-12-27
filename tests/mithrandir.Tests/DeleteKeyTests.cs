@@ -82,10 +82,10 @@ public class DeleteKeyTests : IClassFixture<CustomWebApplicationFactory>
         var authKeyResult = await authKeyResponse.Content.ReadFromJsonAsync<GenerateKeyResponse>();
         Assert.NotNull(authKeyResult);
         
-        // Add IP to whitelist 
+        // Add IP to whitelist
         var addToWhitelistRequest = new AddToWhitelistRequest
         {
-            Key = authKeyResult.Key,
+            Id = authKeyResult.Id,
             IpAddress = TestIp,
         };
         var addToWhitelistResponse = await _client.PostAsJsonAsync("/api/admin/keys/whitelist/add", addToWhitelistRequest);

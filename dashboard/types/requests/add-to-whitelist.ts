@@ -1,4 +1,4 @@
 export interface AddToWhitelistRequest {
-  key: string
+  id: number
   ipAddress: string
 }

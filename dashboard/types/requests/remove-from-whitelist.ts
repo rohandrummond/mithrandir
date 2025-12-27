@@ -1,4 +1,4 @@
 export interface RemoveFromWhitelistRequest {
-  key: string
+  id: number
   ipAddress: string
 }

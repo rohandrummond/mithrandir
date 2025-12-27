@@ -30,29 +30,24 @@ export function KeyTable() {
   const { data, error, isLoading, mutate } = useApiKeys()
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [selectedKey, setSelectedKey] = useState<ApiKey | null>(null)
+  const [selectedKeyId, setSelectedKeyId] = useState<number | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [whitelistDialogOpen, setWhitelistDialogOpen] = useState(false)
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false)
 
+  // Derive selected key from current data so it updates when data refreshes
+  const selectedKey = selectedKeyId
+    ? data?.keys?.find((k) => k.id === selectedKeyId) ?? null
+    : null
+
   const handleDelete = (apiKey: ApiKey) => {
-    setSelectedKey(apiKey)
+    setSelectedKeyId(apiKey.id)
     setDeleteDialogOpen(true)
   }
 
   const handleManageWhitelist = (apiKey: ApiKey) => {
-    setSelectedKey(apiKey)
+    setSelectedKeyId(apiKey.id)
     setWhitelistDialogOpen(true)
-  }
-
-  const handleAddIp = (ip: string) => {
-    // TO DO
-    console.log('Add IP:', ip, 'to key:', selectedKey?.id)
-  }
-
-  const handleRemoveIp = (ip: string) => {
-    // TO DO
-    console.log('Remove IP:', ip, 'from key:', selectedKey?.id)
   }
 
   const columns = useMemo(
@@ -171,8 +166,7 @@ export function KeyTable() {
         open={whitelistDialogOpen}
         onOpenChange={setWhitelistDialogOpen}
         apiKey={selectedKey}
-        onAddIp={handleAddIp}
-        onRemoveIp={handleRemoveIp}
+        onSuccess={() => mutate()}
       />
 
       <GenerateKeyDialog

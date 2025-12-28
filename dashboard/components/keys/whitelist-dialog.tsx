@@ -85,7 +85,9 @@ export function WhitelistDialog({
       onSuccess()
     } catch (err) {
       console.error('Failed to add IP to whitelist:', err)
-      setError(err instanceof Error ? err.message : 'Failed to add IP to whitelist')
+      setError(
+        err instanceof Error ? err.message : 'Failed to add IP to whitelist'
+      )
     } finally {
       setIsLoading(false)
     }
@@ -113,7 +115,11 @@ export function WhitelistDialog({
       onSuccess()
     } catch (err) {
       console.error('Failed to remove IP from whitelist:', err)
-      setError(err instanceof Error ? err.message : 'Failed to remove IP from whitelist')
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to remove IP from whitelist'
+      )
     } finally {
       setIsLoading(false)
     }
@@ -139,9 +145,7 @@ export function WhitelistDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2">
             <Input
               placeholder="Enter IP address..."
@@ -150,7 +154,11 @@ export function WhitelistDialog({
               onKeyDown={handleKeyDown}
               disabled={isLoading}
             />
-            <Button onClick={handleAddIp} disabled={!newIp.trim() || isLoading}>
+            <Button
+              onClick={handleAddIp}
+              disabled={!newIp.trim() || isLoading}
+              className="cursor-pointer"
+            >
               {isLoading ? 'Adding...' : 'Add IP'}
             </Button>
           </div>
@@ -168,6 +176,7 @@ export function WhitelistDialog({
                   <span className="text-sm font-mono">{ip}</span>
                   <Button
                     variant="ghost"
+                    className="cursor-pointer"
                     size="icon-sm"
                     onClick={() => handleRemoveIp(ip)}
                     disabled={isLoading}

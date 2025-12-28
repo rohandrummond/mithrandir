@@ -75,14 +75,13 @@ export function DeleteKeyDialog({
             &quot;? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
         <DialogFooter>
           <Button
             variant="outline"
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
+            className="cursor-pointer"
           >
             Cancel
           </Button>
@@ -90,6 +89,7 @@ export function DeleteKeyDialog({
             variant="destructive"
             onClick={handleConfirm}
             disabled={isDeleting}
+            className="cursor-pointer"
           >
             {isDeleting ? 'Deleting...' : 'Delete'}
           </Button>

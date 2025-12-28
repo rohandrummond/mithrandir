@@ -30,13 +30,17 @@ export function KeyActionsMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="p-2 pr-3">
-        <DropdownMenuItem onClick={() => onManageWhitelist(apiKey)}>
+        <DropdownMenuItem
+          onClick={() => onManageWhitelist(apiKey)}
+          className="cursor-pointer"
+        >
           <ShieldCheck />
           Manage Whitelist
         </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           onClick={() => onDelete(apiKey)}
+          className="cursor-pointer"
         >
           <Trash2 />
           Delete

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using HealthChecks.UI.Client;
 using mithrandir.Data;
 using mithrandir.Services;
 using mithrandir.Middleware;
@@ -50,6 +51,15 @@ public partial class Program
         builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
         builder.Services.AddScoped<IRateLimitService, RateLimitService>();
 
+        // Health checks
+        builder.Services.AddHealthChecks()
+            .AddDbContextCheck<MithrandirDbContext>("database", tags: ["ready"])
+            .AddRedis(
+                builder.Configuration.GetConnectionString("MithrandirRedis") ??
+                    throw new InvalidOperationException("Redis connection string is not configured"),
+                name: "redis",
+                tags: ["ready"]);
+
         // Framework services
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -73,6 +83,19 @@ public partial class Program
         {
             app.UseHttpsRedirection();
         }
+
+        // Health check endpoints (before auth middleware so they're publicly accessible)
+        app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = _ => false, // No checks - just confirms app is running
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
+        app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready"),
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
 
         // Register middleware
         app.UseMiddleware<RequestLoggingMiddleware>();

@@ -20,13 +20,20 @@ public class AuthenticationMiddleware
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
         _logger.LogInformation("Processing request with authentication middleware");
-        
+
         // Do not apply middleware on admin routes
         if (context.Request.Path.StartsWithSegments("/api/admin"))
         {
             _logger.LogInformation("Admin path detected, bypassing authentication: {Path}",
                 context.Request.Path);
-            
+
+            await _next(context);
+            return;
+        }
+
+        // Do not apply middleware on health check routes
+        if (context.Request.Path.StartsWithSegments("/health"))
+        {
             await _next(context);
             return;
         }

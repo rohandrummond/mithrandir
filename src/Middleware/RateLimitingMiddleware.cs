@@ -23,6 +23,13 @@ public class RateLimitingMiddleware
     {
         _logger.LogInformation("Processing request with rate limiting middleware");
 
+        // Skip rate limiting for health check routes
+        if (context.Request.Path.StartsWithSegments("/health"))
+        {
+            await _next(context);
+            return;
+        }
+
         // Check if this is an admin route
         var isAdminRoute = context.Request.Path.StartsWithSegments("/api/admin");
 

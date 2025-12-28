@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/nav'
+import Footer from '@/components/footer'
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
@@ -21,8 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jetbrainsMono.variable} antialiased`}>
-        <Nav />
-        <main className="p-6">{children}</main>
+        <div className="flex flex-col min-h-screen">
+          <Nav />
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   )

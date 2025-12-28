@@ -1,4 +1,15 @@
 services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__MithrandirDb: "Host=db;Port=5432;Database=${POSTGRES_DB:-mithrandirdb};Username=${POSTGRES_USER:-rohan};Password=${POSTGRES_PASSWORD:?Database password required}"
+      ConnectionStrings__MithrandirRedis: "redis:6379"
+      AdminApiKey: ${ADMIN_API_KEY:-test-admin-key}
+    depends_on:
+      - db
+      - redis
   db:
     image: postgres:16
     ports:

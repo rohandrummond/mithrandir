@@ -9,6 +9,17 @@ public partial class Program
 {
     public static void Main(string[] args)
     {
+        // Load .env file in development (standardizes secrets in one place)
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
+            Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development")
+        {
+            var envPath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+            if (File.Exists(envPath))
+            {
+                DotNetEnv.Env.Load(envPath);
+            }
+        }
+
         var builder = WebApplication.CreateBuilder(args);
 
         // Postgres connection

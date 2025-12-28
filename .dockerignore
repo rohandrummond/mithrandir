@@ -1,0 +1,37 @@
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.sln.DotSettings.user
+
+# Build artifacts
+**/bin/
+**/obj/
+
+# Tests (not needed in production image)
+tests/
+
+# Frontend (deployed separately via Vercel)
+dashboard/
+
+# Local Docker data volumes
+postgres-data/
+redis-data/
+
+# Local environment files
+.env
+.env.*
+src/appsettings.Development.json
+
+# Documentation and config
+README.md
+CLAUDE.md
+PLAN.md
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db

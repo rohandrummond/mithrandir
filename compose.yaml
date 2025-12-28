@@ -7,6 +7,7 @@ services:
       ConnectionStrings__MithrandirDb: "Host=db;Port=5432;Database=${POSTGRES_DB:-mithrandirdb};Username=${POSTGRES_USER:-rohan};Password=${POSTGRES_PASSWORD:?Database password required}"
       ConnectionStrings__MithrandirRedis: "redis:6379"
       AdminApiKey: ${ADMIN_API_KEY:-test-admin-key}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     depends_on:
       - db
       - redis

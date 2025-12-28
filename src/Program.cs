@@ -60,6 +60,22 @@ public partial class Program
                 name: "redis",
                 tags: ["ready"]);
 
+        // CORS
+        var corsOrigins = builder.Configuration["CORS_ORIGINS"]?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            ?? [];
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins(corsOrigins)
+                    .WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                    .WithHeaders("Content-Type", "X-Api-Key", "X-Admin-Key")
+                    .AllowCredentials();
+            });
+        });
+
         // Framework services
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -96,6 +112,9 @@ public partial class Program
             Predicate = check => check.Tags.Contains("ready"),
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
+
+        // CORS 
+        app.UseCors();
 
         // Register middleware
         app.UseMiddleware<RequestLoggingMiddleware>();

@@ -9,3 +9,9 @@ variable "project_name" {
   type        = string
   default     = "mithrandir"
 }
+
+variable "my_ip" {
+  description = "Your public IP address for SSH access"
+  type        = string
+  default     = "161.29.122.70"
+}

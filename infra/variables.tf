@@ -15,3 +15,15 @@ variable "my_ip" {
   type        = string
   default     = "161.29.122.70"
 }
+
+variable "key_name" {
+  description = "Name of the SSH key pair in AWS"
+  type        = string
+  default     = "mithrandir"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t4g.micro"
+}

@@ -58,6 +58,7 @@ Thumbs.db
 
 # Environment files
 .env
+.env.production
 *.env.local
 appsettings.*.json
 !appsettings.json

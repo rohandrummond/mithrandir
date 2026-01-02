@@ -13,7 +13,7 @@ variable "project_name" {
 variable "my_ip" {
   description = "Your public IP address for SSH access"
   type        = string
-  default     = "161.29.122.70"
+  default     = "203.211.74.88"
 }
 
 variable "key_name" {

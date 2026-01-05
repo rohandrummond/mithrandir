@@ -87,11 +87,18 @@ public partial class Program
 
         var app = builder.Build();
 
-        // Apply migrations on startup
+        // Apply migrations on startup (only for relational databases)
         using (var scope = app.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<MithrandirDbContext>();
-            db.Database.Migrate();
+            if (db.Database.IsRelational())
+            {
+                db.Database.Migrate();
+            }
+            else
+            {
+                db.Database.EnsureCreated();
+            }
         }
 
         // Dev middleware

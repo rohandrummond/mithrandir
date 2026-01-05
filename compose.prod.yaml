@@ -1,27 +1,46 @@
 services:
+
+  # .NET API 
   api:
+    # Pull from ECR
     image: 322906267612.dkr.ecr.ap-southeast-2.amazonaws.com/mithrandir-api:latest
+
+    # Map EC2 port 80 (HTTP) to container port 8080 (.NET)
     ports:
       - "80:8080"
+
+    # Environment variables
     environment:
+      # Postgres
       - ConnectionStrings__MithrandirDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      # Redis
       - ConnectionStrings__MithrandirRedis=redis:6379
+      # Admin key
       - ADMIN_API_KEY=${ADMIN_API_KEY}
+      # CORS for Vercel Dashboard
       - CORS_ORIGINS=${CORS_ORIGINS}
+      # Set .NET environment to prod
       - ASPNETCORE_ENVIRONMENT=Production
+
+    # Wait for Postgres and Redis before starting
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+    # Automatically restart if the container crashes
     restart: unless-stopped
+
+    # Health checks
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      interval: 30s       
+      timeout: 10s        
+      retries: 3         
+      start_period: 10s 
 
+  # Postgres
   postgres:
     image: postgres:16-alpine
     environment:
@@ -37,6 +56,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # Redis
   redis:
     image: redis:7-alpine
     volumes:
@@ -48,6 +68,7 @@ services:
       timeout: 5s
       retries: 5
 
+# Data volumes for Postgres and Redis
 volumes:
   postgres_data:
   redis_data:

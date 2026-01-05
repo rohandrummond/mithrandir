@@ -10,7 +10,7 @@ public partial class Program
 {
     public static void Main(string[] args)
     {
-        // Load .env file in development (standardizes secrets in one place)
+        // Load .env file in development
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
             Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development")
         {
@@ -86,6 +86,13 @@ public partial class Program
         builder.Services.AddSwaggerGen();
 
         var app = builder.Build();
+
+        // Apply migrations on startup
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<MithrandirDbContext>();
+            db.Database.Migrate();
+        }
 
         // Dev middleware
         if (app.Environment.IsDevelopment())

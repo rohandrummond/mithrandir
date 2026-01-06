@@ -37,6 +37,13 @@ public class AuthenticationMiddleware
             await _next(context);
             return;
         }
+
+        // Do not apply middleware on Swagger routes
+        if (context.Request.Path.StartsWithSegments("/swagger"))
+        {
+            await _next(context);
+            return;
+        }
         
         if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKeyValue))
         {

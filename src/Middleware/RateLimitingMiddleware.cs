@@ -30,6 +30,13 @@ public class RateLimitingMiddleware
             return;
         }
 
+        // Skip rate limiting for Swagger routes
+        if (context.Request.Path.StartsWithSegments("/swagger"))
+        {
+            await _next(context);
+            return;
+        }
+
         // Check if this is an admin route
         var isAdminRoute = context.Request.Path.StartsWithSegments("/api/admin");
 

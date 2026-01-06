@@ -15,8 +15,8 @@ services:
       - ConnectionStrings__MithrandirDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       # Redis
       - ConnectionStrings__MithrandirRedis=redis:6379
-      # Admin key
-      - ADMIN_API_KEY=${ADMIN_API_KEY}
+      # Admin key (mapped to .NET config name)
+      - AdminApiKey=${ADMIN_API_KEY}
       # CORS for Vercel Dashboard
       - CORS_ORIGINS=${CORS_ORIGINS}
       # Set .NET environment to prod

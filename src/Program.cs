@@ -101,12 +101,9 @@ public partial class Program
             }
         }
 
-        // Dev middleware
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        // Swagger (API docs)
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         // Enable HTTPS redirection in production
         if (!app.Environment.IsDevelopment())

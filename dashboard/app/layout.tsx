@@ -10,7 +10,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mithrandir Admin',
+  title: 'Mithrandir',
   description: 'API Key Management Dashboard',
 }
 

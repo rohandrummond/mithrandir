@@ -47,9 +47,10 @@ public partial class Program
         // Time provider (for testing)
         builder.Services.AddSingleton(TimeProvider.System);
 
-        // Inject API key service
+        // Inject services
         builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
         builder.Services.AddScoped<IRateLimitService, RateLimitService>();
+        builder.Services.AddScoped<IZodiacService, ZodiacService>();
 
         // Health checks
         builder.Services.AddHealthChecks()

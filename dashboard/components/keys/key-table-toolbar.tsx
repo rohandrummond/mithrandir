@@ -32,8 +32,8 @@ export function KeyTableToolbar({
   return (
     <>
       <div className="flex flex-row items-center justify-between">
-        <h1 className="text-3xl font-bold">API Keys</h1>
-        <Button onClick={onGenerateKey} className="cursor-pointer">
+        <h1 className="text-2xl md:text-3xl font-bold">API Keys</h1>
+        <Button onClick={onGenerateKey} className="cursor-pointer text-xs md:text-sm h-8 md:h-9 px-3 md:px-4">
           <Plus className="w-4 h-4" />
           Generate new key
         </Button>
@@ -47,7 +47,7 @@ export function KeyTableToolbar({
             onChange={(e) =>
               table.getColumn('name')?.setFilterValue(e.target.value)
             }
-            className="pl-9"
+            className="pl-9 h-8 md:h-9 text-xs md:text-sm"
           />
         </div>
         <div className="flex gap-2">
@@ -59,7 +59,7 @@ export function KeyTableToolbar({
                 ?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger className="cursor-pointer">
+            <SelectTrigger className="cursor-pointer h-8 md:h-9 text-xs md:text-sm">
               <SelectValue placeholder="Tier" />
             </SelectTrigger>
             <SelectContent>
@@ -76,7 +76,7 @@ export function KeyTableToolbar({
                 ?.setFilterValue(value === 'all' ? '' : value)
             }
           >
-            <SelectTrigger className="cursor-pointer">
+            <SelectTrigger className="cursor-pointer h-8 md:h-9 text-xs md:text-sm">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>

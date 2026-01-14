@@ -2,19 +2,9 @@ export function QuickStart() {
   const apiUrl = process.env.NEXT_PUBLIC_DOTNET_API_URL
 
   return (
-    <div className="mt-8 sm:mt-10 md:mt-12 text-xs sm:text-sm text-muted-foreground space-y-2">
-      <p>Want to know your middle earth zodiac?</p>
-      <ol className="list-decimal list-inside space-y-1">
-        <li>Generate your key</li>
-        <li>Add your IP to the whitelist</li>
-        <li>Update the below command and ping the API</li>
-      </ol>
-      <pre className="font-mono mt-2 rounded-md bg-muted/50 p-3 overflow-x-auto whitespace-pre">
-        {`
-          curl -X POST "${apiUrl}/api/zodiac?dob=<yyyy-mm-dd>" \\
-            -H "X-Api-Key: <your-api-key>"
-        `}
-      </pre>
+    <div className="mt-10 sm:mt-0 text-xs text-muted-foreground space-y-2">
+      <p>Uncover your middle earth star sign 🔮</p>
+      <pre className="font-mono rounded-md bg-muted/50 pl-0 sm:pl-3 overflow-x-auto whitespace-pre-wrap">{`curl "${apiUrl}/api/zodiac?dob=<yyyy-mm-dd>" -H "X-Api-Key: <your-api-key>"`}</pre>
     </div>
   )
 }

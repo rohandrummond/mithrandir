@@ -25,6 +25,7 @@ import { KeyTablePagination } from './key-table-pagination'
 import { DeleteKeyDialog } from './delete-key-dialog'
 import { WhitelistDialog } from './whitelist-dialog'
 import { GenerateKeyDialog } from './generate-key-dialog'
+import { QuickStart } from '@/components/quick-start'
 
 export function KeyTable() {
   const { data, error, isLoading, mutate } = useApiKeys()
@@ -164,6 +165,8 @@ export function KeyTable() {
       </div>
 
       <KeyTablePagination table={table} />
+
+      <QuickStart />
 
       <DeleteKeyDialog
         open={deleteDialogOpen}

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -55,7 +54,8 @@ export default function Nav() {
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="w-[280px] p-4 [&>button:last-child]:hidden"
+          className="w-[280px] p-4"
+          hideDefaultClose
           aria-describedby={undefined}
         >
           <SheetTitle className="sr-only">Navigation menu</SheetTitle>

@@ -5,7 +5,7 @@ namespace mithrandir.Services;
 
 public class ZodiacService : IZodiacService
 {
-    private static readonly Dictionary<ZodiacSign, LotRCharacter> Characters = new()
+    private static readonly IReadOnlyDictionary<ZodiacSign, LotRCharacter> Characters = new Dictionary<ZodiacSign, LotRCharacter>()
     {
         [ZodiacSign.Aries] = new LotRCharacter
         {

@@ -74,7 +74,7 @@ export function KeyTable() {
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 5,
+        pageSize: 3,
       },
     },
   })

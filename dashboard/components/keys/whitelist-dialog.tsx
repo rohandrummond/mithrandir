@@ -45,7 +45,8 @@ export function WhitelistDialog({
   onSuccess,
 }: WhitelistDialogProps) {
   const [newIp, setNewIp] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isAddingIp, setIsAddingIp] = useState(false)
+  const [removingIp, setRemovingIp] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleOpenChange = (open: boolean) => {
@@ -65,7 +66,7 @@ export function WhitelistDialog({
       return
     }
 
-    setIsLoading(true)
+    setIsAddingIp(true)
     setError(null)
 
     try {
@@ -89,14 +90,14 @@ export function WhitelistDialog({
         err instanceof Error ? err.message : 'Failed to add IP to whitelist'
       )
     } finally {
-      setIsLoading(false)
+      setIsAddingIp(false)
     }
   }
 
   const handleRemoveIp = async (ip: string) => {
     if (!apiKey) return
 
-    setIsLoading(true)
+    setRemovingIp(ip)
     setError(null)
 
     try {
@@ -121,7 +122,7 @@ export function WhitelistDialog({
           : 'Failed to remove IP from whitelist'
       )
     } finally {
-      setIsLoading(false)
+      setRemovingIp(null)
     }
   }
 
@@ -152,14 +153,14 @@ export function WhitelistDialog({
               value={newIp}
               onChange={(e) => setNewIp(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isLoading}
+              disabled={isAddingIp || removingIp !== null}
             />
             <Button
               onClick={handleAddIp}
-              disabled={!newIp.trim() || isLoading}
+              disabled={!newIp.trim() || isAddingIp || removingIp !== null}
               className="cursor-pointer"
             >
-              {isLoading ? 'Adding...' : 'Add IP'}
+              {isAddingIp ? 'Adding...' : 'Add IP'}
             </Button>
           </div>
           {whitelist.length === 0 ? (
@@ -179,7 +180,7 @@ export function WhitelistDialog({
                     className="cursor-pointer"
                     size="icon-sm"
                     onClick={() => handleRemoveIp(ip)}
-                    disabled={isLoading}
+                    disabled={isAddingIp || removingIp !== null}
                   >
                     <X className="h-4 w-4" />
                     <span className="sr-only">Remove {ip}</span>

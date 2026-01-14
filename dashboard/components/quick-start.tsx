@@ -10,9 +10,10 @@ export function QuickStart() {
         <li>Update the below command and ping the API</li>
       </ol>
       <pre className="font-mono mt-2 rounded-md bg-muted/50 p-3 overflow-x-auto whitespace-pre">
-        {`curl -X POST ${apiUrl}/api/who-am-i \\
-            -H "X-Api-Key: <your-api-key>" \\
-            -d "dob=<yyyy-mm-dd>"`}
+        {`
+          curl -X POST "${apiUrl}/api/zodiac?dob=<yyyy-mm-dd>" \\
+            -H "X-Api-Key: <your-api-key>"
+        `}
       </pre>
     </div>
   )

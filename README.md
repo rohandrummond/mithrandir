@@ -133,6 +133,47 @@ The API runs on `http://localhost:8080` and the dashboard on `http://localhost:3
 
 **Running Tests**
 
+Tests require Redis to be running on `localhost:6379`. Start it first, then run the tests:
+
 ```bash
+# Start Redis (if not already running)
+docker compose up redis -d
+
+# Run tests
 dotnet test
+```
+
+**Local Development (without Docker for .NET API)**
+
+If you prefer to run the .NET API locally with `dotnet run` (useful for debugging), start only the infrastructure containers:
+
+```bash
+# Start only PostgreSQL and Redis
+docker compose up db redis -d
+```
+
+Then create a `.env` file in the root with connection strings for local development:
+
+```
+POSTGRES_USER=your-username
+POSTGRES_PASSWORD=your-password
+POSTGRES_DB=mithrandirdb
+ADMIN_API_KEY=your-admin-key
+ConnectionStrings__MithrandirDb=Host=localhost;Port=5432;Database=mithrandirdb;Username=your-username;Password=your-password
+ConnectionStrings__MithrandirRedis=localhost:6379
+CORS_ORIGINS=http://localhost:3000
+```
+
+Run the API:
+
+```bash
+cd src
+dotnet run
+```
+
+The API will be available at `http://localhost:5193`. Update your dashboard's `.env.local` to use this URL:
+
+```
+NEXT_PUBLIC_DOTNET_API_URL=http://localhost:5193
+ADMIN_API_KEY=your-admin-key
 ```

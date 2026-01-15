@@ -1,98 +1,138 @@
-# Mithrandir 🧙‍♂️
+# Mithrandir 🔮
 
-API key management and rate limiting service built with .NET, PostgreSQL, Redis and Docker.
+<!-- TODO: Add screenshot of dashboard here -->
+<!-- ![Dashboard Screenshot](screenshot.png) -->
 
-Mithrandir is a service that provides API key generation, validation and management with rate limiting and usage
-analytics. Currently it supports a Free and Pro tier with configurable rate limits and IP whitelisting. All API 
-keys are hashed using BCrypt before storage.
+  🔗 [Live demo](https://mithrandir-rho.vercel.app/)
 
-Now that I've finished with the prototype, I'll be working on deployment and building a front end dashboard for interacting 
-with the app.
+**About the project**
 
-## Tech Stack 👷‍♂️
+Mithrandir is a service that supports API key management, IP whitelisting and rate limiting. 
 
-- **Framework**: .NET 9
-- **Database**: PostgreSQL 16 with Entity Framework Core
-- **Caching**: Redis (for rate limiting)
-- **Security**: BCrypt key hashing
-- **Testing**: xUnit integration testing
-- **Infrastructure**: Docker
+It's built around a .NET MVC API that uses PostgreSQL for securely storing API keys, and Redis for monitoring rate limits. Also included is a Next.js dashboard for interacting with the service using a browser.
 
-## Features 🚀
+The .NET backend uses a custom middleware pipeline to process each request through logging, authentication and rate limiting before reaching the controllers. Once a request has been authenticated, Entity Framework Core handles database access and a response is sent. 
+
+## Key features 💡
+
+**.NET Architecture**
+
+- MVC pattern with controllers, services, and models
+- Custom middleware pipeline i.e. logging → auth → rate limit → controller
+- Service layer with dependency injection (`IApiKeyService`, `IRateLimitService`)
+- Entity Framework Core for PostgreSQL data access
+
 
 **API Key Management**
-- Generate API keys with tiers and expiry dates
-- Revoke and delete keys 
-- Key validation e.g. active, expired, revoked
+
+- Cryptographically secure key generation using `RandomNumberGenerator`
 - Keys stored as BCrypt hashes
+- Admin ability to generate, validate, revoke and delete keys
+- Optional expiration dates and usage tracking
+
+**API Key Authentication**
+
+- Dual authentication approach - `X-Api-Key` for users, `X-Admin-Key` for admin endpoints
+- Timing attack prevention via constant time comparison
+- IP whitelisting with IPv4/IPv6 normalization
 
 **Rate Limiting**
-- Sliding 10 minute window rate limit
-- Tier based limits e.g. free (10 requests) and pro (50 requests)
-- Inclusion of `Retry-After` header in client responses
 
-**IP Whitelisting**
-- Per key IP whitelists
-- IPv4 and IPv6 address standardisation
-- Proxy IP detection using `X-Forwarded-For` header
+- Redis-based sliding window rate limit
+- Tiered limits with `Retry-After` header on 429 responses
 
-**Usage Analytics**
-- Timestamp, endpoint, IP, and status code logging for requests
-- Ability to query key usage e.g. total requests, success/failure counts
-- Summary of usage by endpoint and HTTP status code
+**Testing**
 
-## API Endpoints
+- xUnit integration tests with real middleware pipeline
+- In-memory database and dedicated Redis instance for testing
+- Custom `FakeTimeProvider` for testing time-dependent rate limit windows
 
-**Public Endpoints** (require `X-Api-Key` header)
+## Tech stack ⚙️
 
-| Method | Endpoint | Description          |
-|--------|----------|----------------------|
-| POST | `/api/keys/validate` | Validate an API key  |
-| POST | `/api/keys/usage` | Get usage statistics |
-| PATCH | `/api/keys/revoke` | Revoke a key         |
+**Backend**
 
-**Admin Endpoints** (require `X-Admin-Key` header)
+- .NET
+- PostgreSQL
+- Redis
+- Entity Framework Core
+- BCrypt
+- xUnit
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/admin/keys/generate` | Generate a new API key |
-| DELETE | `/api/admin/keys/delete` | Delete an API key |
-| POST | `/api/admin/keys/whitelist/add` | Add IP to whitelist |
-| DELETE | `/api/admin/keys/whitelist/remove` | Remove IP from whitelist |
+**Frontend**
 
-## Architecture 
+- Next.js
+- Tailwind CSS
+- shadcn
+
+**Infrastructure**
+
+- Amazon EC2
+- Docker Compose 
+- Vercel
+- Terraform
+- GitHub Actions
+
+## Deployment ☁️
+
+The .NET  API, PostgreSQL and Redis run as a Docker Compose multi-container application on Amazon EC2. The Next.js dashboard is hosted with Vercel.
+
+Terraform provisions the AWS infrastructure using code i.e. EC2 instance with Docker, VPC, ECR , IAM roles and security groups.
+
+GitHub Actions handles CI/CD which includes through 3 phases:
+
+1. Set up infrastructure and run tests on an Ubuntu GitHub runner
+2. After tests pass, a Docker image is built for the .NET API and pushed to Amazon ECR
+3. Amazon EC2 is accessed using SSH and a script runs to build the latest image and restarts the application with Docker Compose
+
+## Getting Started 🚀
+
+**Prerequisites**
+
+- .NET SDK (if running tests)
+- Node.js
+- Docker & Docker Compose
+
+**Clone the repository**
+
+```bash
+git clone https://github.com/rohandrummond/mithrandir.git
+cd mithrandir
+```
+
+**Set up environment Variables**
+
+Create a `.env` file in the root directory:
 
 ```
-src/
-├── Controllers/       # API endpoints
-├── Services/          # Key management and rate limiting helpers
-├── Middleware/        # Authentication, rate limiting, request logging
-├── Models/            # Classes and DTOs
-├── Data/              # EF Core database context
-└── Utilities/         # IP address helpers
-
-tests/
-├── mithrandir.Tests/  # Integration tests
+POSTGRES_PASSWORD=your-password
+POSTGRES_USER=your-username
+POSTGRES_DB=mithrandirdb
+ADMIN_API_KEY=your-admin-key
 ```
 
-## Testing 🧪
+Create a `.env.local` file in the `/dashboard` directory:
 
-**Coverage**
-- Key generation, validation, revocation and deletion
-- IP whitelist add and remove operations
-- Rate limit enforcement and window reset
-- Usage data requests
+```
+NEXT_PUBLIC_DOTNET_API_URL=http://localhost:8080
+ADMIN_API_KEY=your-admin-key
+```
 
-**Configuration**
-- In-memory Postgres database
-- Dedicated test Redis instance 
-- Custom `TimeProvider` for testing rate limiting reset
+**Run the project**
 
-## License 👨‍⚖️
+```bash
+# Start the backend (Docker Compose builds and runs API, PostgreSQL, and Redis containers)
+docker compose up -d
 
-This project is open source under the MIT License.
+# Start the frontend
+cd dashboard
+npm install
+npm run dev
+```
 
-## Contact 📫
+The API runs on `http://localhost:8080` and the dashboard on `http://localhost:3000`.
 
-Check out my other projects and contact info on my [GitHub](https://github.com/rohandrummond) profile.
+**Running Tests**
 
+```bash
+dotnet test
+```

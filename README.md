@@ -1,8 +1,5 @@
 # Mithrandir 🔮
 
-<!-- TODO: Add screenshot of dashboard here -->
-<!-- ![Dashboard Screenshot](screenshot.png) -->
-
   🔗 [Live demo](https://mithrandir-rho.vercel.app/)
 
 **About the project**
@@ -11,14 +8,22 @@ Mithrandir is a service that supports API key management, IP whitelisting and ra
 
 It's built around a .NET MVC API that uses PostgreSQL for securely storing API keys, and Redis for monitoring rate limits. Also included is a Next.js dashboard for interacting with the service using a browser.
 
-The .NET backend uses a custom middleware pipeline to process each request through logging, authentication and rate limiting before reaching the controllers. Once a request has been authenticated, Entity Framework Core handles database access and a response is sent. 
+The .NET backend uses a custom middleware pipeline to process each request through logging, authentication and rate limiting before reaching the controllers. Once a request has been authenticated, Entity Framework Core handles database access and a response is sent.
+
+**Why I built it**
+
+After finishing Dev Academy Aotearoa I was feeling like diving back into some C#. I had built some functional .NET projects before, but wanted to delve deeper into common tools and concepts like the MVC pattern, dependency injection, middleware and Entity Framework Core.
+
+I had been thinking about deploying some of the APIs I had built in earlier projects, which had me wondering how to protect these from both a security and cost perspective. This is what made me want to focus on authenticating HTTP requests and enforcing rate limits with Redis. 
+
+It was also the perfect opportunity to deploy something slightly more complex on AWS, and get some basic experience with Docker and Terraform. Setting up a CI/CD pipeline with GitHub Actions was also on my list.
 
 ## Key features 💡
 
 **.NET Architecture**
 
 - MVC pattern with controllers, services, and models
-- Custom middleware pipeline i.e. logging → auth → rate limit → controller
+- Custom middleware pipeline i.e. logging > auth > rate limit > controller
 - Service layer with dependency injection (`IApiKeyService`, `IRateLimitService`)
 - Entity Framework Core for PostgreSQL data access
 
@@ -32,7 +37,7 @@ The .NET backend uses a custom middleware pipeline to process each request throu
 
 **API Key Authentication**
 
-- Dual authentication approach - `X-Api-Key` for users, `X-Admin-Key` for admin endpoints
+- Dual authentication approach i.e. `X-Api-Key` for users, `X-Admin-Key` for admin endpoints
 - Timing attack prevention via constant time comparison
 - IP whitelisting with IPv4/IPv6 normalization
 
@@ -75,6 +80,8 @@ The .NET backend uses a custom middleware pipeline to process each request throu
 ## Deployment ☁️
 
 The .NET  API, PostgreSQL and Redis run as a Docker Compose multi-container application on Amazon EC2. The Next.js dashboard is hosted with Vercel.
+
+- I was considering using a combination of RDS (Postgres) and ElastiCache (Redis), but found that for this scale it was cheaper and easier to use EC2
 
 Terraform provisions the AWS infrastructure using code i.e. EC2 instance with Docker, VPC, ECR , IAM roles and security groups.
 

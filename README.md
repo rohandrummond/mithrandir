@@ -138,6 +138,13 @@ npm run dev
 
 The API runs on `http://localhost:8080` and the dashboard on `http://localhost:3000`.
 
+If you run into issues when starting everything up for the first time, try restarting the Docker containers using the below command:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
 **Running Tests**
 
 Tests require Redis to be running on `localhost:6379`. Start it first, then run the tests:

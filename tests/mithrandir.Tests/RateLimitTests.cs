@@ -34,7 +34,7 @@ public class RateLimitTests : IClassFixture<RateLimitTestWebApplicationFactory>,
         var server = redis.GetServer("localhost", 6379);
         var db = redis.GetDatabase();
 
-        await foreach (var key in server.KeysAsync(database: 15, pattern: "rateLimit:*"))
+        await foreach (var key in server.KeysAsync(database: 14, pattern: "rateLimit:*"))
         {
             await db.KeyDeleteAsync(key);
         }

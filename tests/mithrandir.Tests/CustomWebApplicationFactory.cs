@@ -72,10 +72,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             if (redisDescriptor != null)
                 services.Remove(redisDescriptor);
 
-            // Add a mock Redis using a library like Moq, or use a fake implementation
-            services.AddSingleton<IConnectionMultiplexer>(
-                _ => ConnectionMultiplexer.Connect("localhost:6379,allowAdmin=true,defaultDatabase=15")
-            );
+            // Add test Redis connection using database 15 and flush it to clear any stale rate limit data
+            var redis = ConnectionMultiplexer.Connect("localhost:6379,allowAdmin=true,defaultDatabase=15");
+            redis.GetServer("localhost:6379").FlushDatabase(15);
+            services.AddSingleton<IConnectionMultiplexer>(redis);
         });
 
         builder.ConfigureAppConfiguration((context, config) =>

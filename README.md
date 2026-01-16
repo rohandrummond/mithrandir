@@ -16,7 +16,7 @@ After finishing Dev Academy Aotearoa I was feeling like diving back into some C#
 
 I had been thinking about deploying some of the APIs I had built in earlier projects, which had me wondering how to protect these from both a security and cost perspective. This is what made me want to focus on authenticating HTTP requests and enforcing rate limits with Redis. 
 
-It was also the perfect opportunity to deploy something slightly more complex on AWS, and get some basic experience with Docker and Terraform. Setting up a CI/CD pipeline with GitHub Actions was also on my list.
+It was also the perfect opportunity to deploy something slightly more complex on AWS, and get some basic experience with Docker and Terraform. Setting up a CI/CD pipeline with GitHub Actions was also something that I had been wanting to try out.
 
 ## Key features 💡
 
@@ -26,7 +26,6 @@ It was also the perfect opportunity to deploy something slightly more complex on
 - Custom middleware pipeline i.e. logging > auth > rate limit > controller
 - Service layer with dependency injection (`IApiKeyService`, `IRateLimitService`)
 - Entity Framework Core for PostgreSQL data access
-
 
 **API Key Management**
 
@@ -48,9 +47,9 @@ It was also the perfect opportunity to deploy something slightly more complex on
 
 **Testing**
 
-- 52 xUnit integration tests with real middleware pipeline
-- In-memory database and dedicated Redis instance for testing
-- Custom `FakeTimeProvider` for testing time-dependent rate limit windows
+- 52 integration tests built with xUnit and a real middleware pipeline
+- In memory database and dedicated Redis instance for testing
+- Custom `FakeTimeProvider` for testing time dependent rate limit windows
 
 ## Tech stack ⚙️
 

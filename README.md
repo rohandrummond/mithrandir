@@ -85,11 +85,11 @@ The .NET  API, PostgreSQL and Redis run as a Docker Compose multi-container appl
 
 Terraform provisions the AWS infrastructure using code i.e. EC2 instance with Docker, VPC, ECR , IAM roles and security groups.
 
-GitHub Actions handles CI/CD which includes through 3 phases:
+GitHub Actions handles CI/CD which includes 3 phases:
 
 1. Set up infrastructure and run tests on an Ubuntu GitHub runner
-2. After tests pass, a Docker image is built for the .NET API and pushed to Amazon ECR
-3. Amazon EC2 is accessed using SSH and a script runs to build the latest image and restarts the application with Docker Compose
+2. After tests pass, build a Docker image for the .NET API and push to Amazon ECR
+3. Access Amazon EC2 via SSH, run a script to build the latest image and restart the application with Docker Compose
 
 ## Getting Started 🚀
 

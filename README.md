@@ -48,7 +48,7 @@ It was also the perfect opportunity to deploy something slightly more complex on
 
 **Testing**
 
-- xUnit integration tests with real middleware pipeline
+- 52 xUnit integration tests with real middleware pipeline
 - In-memory database and dedicated Redis instance for testing
 - Custom `FakeTimeProvider` for testing time-dependent rate limit windows
 
@@ -114,7 +114,7 @@ Create a `.env` file in the root directory:
 POSTGRES_PASSWORD=your-password
 POSTGRES_USER=your-username
 POSTGRES_DB=mithrandirdb
-ADMIN_API_KEY=your-admin-key
+AdminApiKey=your-admin-key
 ```
 
 Create a `.env.local` file in the `/dashboard` directory:
@@ -165,7 +165,7 @@ Then create a `.env` file in the root with connection strings for local developm
 POSTGRES_USER=your-username
 POSTGRES_PASSWORD=your-password
 POSTGRES_DB=mithrandirdb
-ADMIN_API_KEY=your-admin-key
+AdminApiKey=your-admin-key
 ConnectionStrings__MithrandirDb=Host=localhost;Port=5432;Database=mithrandirdb;Username=your-username;Password=your-password
 ConnectionStrings__MithrandirRedis=localhost:6379
 CORS_ORIGINS=http://localhost:3000
@@ -183,4 +183,11 @@ The API will be available at `http://localhost:5193`. Update your dashboard's `.
 ```
 NEXT_PUBLIC_DOTNET_API_URL=http://localhost:5193
 ADMIN_API_KEY=your-admin-key
+```
+
+Start the frontend which will be available at `http://localhost:3000`.
+
+```bash
+cd dashboard
+npm run dev
 ```

@@ -1,7 +1,5 @@
 # Mithrandir 🔮
 
-  🔗 [Live demo](https://mithrandir-rho.vercel.app/)
-
 **About the project**
 
 Mithrandir is a service that supports API key management, IP whitelisting and rate limiting. 
@@ -78,16 +76,18 @@ It was also the perfect opportunity to deploy something slightly more complex on
 
 ## Deployment ☁️
 
-The .NET  API, PostgreSQL and Redis run as a Docker Compose multi-container application on Amazon EC2. The Next.js dashboard is hosted with Vercel.
+The project is no longer deployed. Everything is defined in code, so it can be reprovisioned with `terraform apply` at any time.
+
+While it was live, the .NET API, PostgreSQL and Redis ran as a Docker Compose multi-container application on Amazon EC2. The Next.js dashboard was hosted with Vercel.
 
 - I was considering using a combination of RDS (Postgres) and ElastiCache (Redis), but found that for this scale it was cheaper and easier to use EC2
 
-Terraform provisions the AWS infrastructure using code i.e. EC2 instance with Docker, VPC, ECR , IAM roles and security groups.
+Terraform provisioned the AWS infrastructure using code i.e. EC2 instance with Docker, VPC, ECR, IAM roles and security groups.
 
-GitHub Actions handles CI/CD which includes 3 phases:
+GitHub Actions handled CI/CD which included 3 phases:
 
 1. Set up infrastructure and run tests on an Ubuntu GitHub runner
-2. After tests pass, build a Docker image for the .NET API and push to Amazon ECR
+2. After tests passed, build a Docker image for the .NET API and push to Amazon ECR
 3. Access Amazon EC2 via SSH, run a script to build the latest image and restart the application with Docker Compose
 
 ## Getting Started 🚀
@@ -105,7 +105,7 @@ git clone https://github.com/rohandrummond/mithrandir.git
 cd mithrandir
 ```
 
-**Set up environment Variables**
+**Set up environment variables**
 
 Create a `.env` file in the root directory:
 
